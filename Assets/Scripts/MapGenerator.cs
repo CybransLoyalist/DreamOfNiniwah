@@ -9,30 +9,44 @@ namespace Assets.Scripts
         {
             get { return "Map"; }
         }
-
+        
         [SerializeField] private Vector3 Location;
-
         [SerializeField] [Range(1, 255)] private int XResolution;
         [SerializeField] [Range(1, 255)] private int ZResolution;
         [SerializeField] [Range(0, 1000)] private float Scale = 1f;
-        private Color _baseColor = Color.yellow;
+
+        private int TilesCount;
+        private int VerticesXCount;
+        private int VerticesZCount;
+        private List<int>[,] VerticesLocations;
+
+        private const int VerticesPerTile = 5;
+        private const int TrianglesPerTile = 4;
+        private const int TriangleCornersInTriangle = 3;
+        private readonly Color _baseColor = Color.yellow;
 
         protected override void SetMeshNumbers()
         {
-            _numberOfVertices = XResolution * ZResolution * 5;
-            _numberOfTrianglesCorners = XResolution * ZResolution * 12;
-            VerticesLocations = new List<int>[XResolution * 2 + 1, ZResolution * 2 + 1];
-            for (int z = 0; z < ZResolution * 2 + 1; z++)
-            {
-                for (int x = 0; x < XResolution * 2 + 1; x++)
+            TilesCount = XResolution * ZResolution;
+            VerticesXCount = XResolution * 2 + 1;
+            VerticesZCount = ZResolution * 2 + 1;
 
+            _numberOfVertices = TilesCount * VerticesPerTile;
+            _numberOfTrianglesCorners = TilesCount * TrianglesPerTile * TriangleCornersInTriangle;
+            InitializeVerticesLocations();
+        }
+
+        private void InitializeVerticesLocations()
+        {
+            VerticesLocations = new List<int>[VerticesXCount, VerticesZCount];
+            for (int z = 0; z < VerticesZCount; z++)
+            {
+                for (int x = 0; x < VerticesXCount; x++)
                 {
                     VerticesLocations[x, z] = new List<int>();
                 }
             }
         }
-
-        private List<int>[,] VerticesLocations;
 
         protected override void SetVertices()
         {
@@ -51,7 +65,7 @@ namespace Assets.Scripts
                     var vertex10 = new Vector3(Location.x + (float) (x + 1) * Scale, Location.y,
                         Location.z + (float) (z) * Scale);
                     var vertexMiddle = new Vector3(Location.x + ((float) (x) + 0.5f) * Scale, Location.y,
-                        Location.z + ((float)(z) + 0.5f) * Scale);
+                        Location.z + ((float) (z) + 0.5f) * Scale);
 
 
                     VerticesLocations[x * 2, z * 2].Add(counter);
@@ -71,24 +85,27 @@ namespace Assets.Scripts
             }
 
 
-                                    RaiseTile(2, 2, 1f);
-                                    RaiseTile(3, 1, 1f);
-                                    RaiseTile(4, 2, 1f);
-                        
-                                    RaiseTile(1, 3, 1f);
-                                    RaiseTile(5, 3, 1f);
-                        
-                                    RaiseTile(2, 4, 1f);
-                                    RaiseTile(4, 4, 1f);
-                                    RaiseTile(3, 5, 1f);
+            RaiseTile(2, 2, 1f);
+            RaiseTile(3, 1, 1f);
+            RaiseTile(4, 2, 1f);
 
-                        RaiseTile(3,4,  2f);
-                        RaiseTile(3,2,  2f);
-                        RaiseTile(2,3,  2f);
-                        RaiseTile(4,3,  2f);
+            RaiseTile(1, 3, 1f);
+            RaiseTile(5, 3, 1f);
+
+            RaiseTile(2, 4, 1f);
+            RaiseTile(4, 4, 1f);
+            RaiseTile(3, 5, 1f);
+
+            RaiseTile(3, 4, 2f);
+            RaiseTile(3, 2, 2f);
+            RaiseTile(2, 3, 2f);
+            RaiseTile(4, 3, 2f);
             RaiseTile(3, 3, 2f);
 
-            for (int i = 0; i < _numberOfVertices; i+=5)
+            ColorTile(3, 3, Color.green);
+            ColorTile(6, 6, Color.green);
+
+            for (int i = 0; i < _numberOfVertices; i += 5)
             {
                 var middleVertice = i + 4;
 
@@ -96,16 +113,15 @@ namespace Assets.Scripts
                 for (int j = i; j < i + 4; j++)
                 {
                     totalHeight += _vertices[j].y;
-
                 }
 
-                _vertices[middleVertice] = new Vector3(_vertices[middleVertice].x, totalHeight / 4f, _vertices[middleVertice].z); 
+                _vertices[middleVertice] = new Vector3(_vertices[middleVertice].x, totalHeight / 4f,
+                    _vertices[middleVertice].z);
 
-                
             }
 
 
-            ColorTile(3,3, Color.green);
+
         }
 
         private void RaiseTile(int x, int y, float height)
@@ -120,46 +136,6 @@ namespace Assets.Scripts
                     }
                 }
             }
-
-
-//            if (x * 2 + 1 < XResolution * 2 + 1 && y * 2 - 1 < ZResolution * 2 + 1)
-//            {
-//                foreach (var index in VerticesLocations[x * 2 + 1, y * 2 - 1])
-//                {
-//                    var h = (_vertices[VerticesLocations[x * 2 + 1, y * 2 + 1][0]].y + _vertices[VerticesLocations[x * 2 + 1, y * 2  - 1][0]].y) / 2f;
-//                    RaiseVertex(index, h);
-//                }
-//            }
-//            if (x * 2 + 1 < XResolution * 2 + 1 && y * 2 + 3 < ZResolution * 2 + 1)
-//            {
-//                foreach (var index in VerticesLocations[x * 2 + 1, y * 2 + 3])
-//                {
-//                    var h = (_vertices[VerticesLocations[x * 2 + 1, y * 2 + 1][0]].y + _vertices[VerticesLocations[x * 2 + 1, y * 2 +3][0]].y) / 2f;
-//                    RaiseVertex(index, h);
-//
-//                    // RaiseVertex2(index, height);
-//                }
-//            }
-//            if (x * 2 + 3 < XResolution * 2 + 1 && y * 2 + 1 < ZResolution * 2 + 1)
-//            {
-//                foreach (var index in VerticesLocations[x * 2 + 3, y * 2 + 1])
-//                {
-//                    var h = (_vertices[VerticesLocations[x * 2 + 1, y * 2 + 1][0]].y + _vertices[VerticesLocations[x * 2 + 3, y * 2 + 1][0]].y) / 2f;
-//                    RaiseVertex(index, h);
-//
-//                    // RaiseVertex2(index, height);
-//                }
-//            }
-//            if (x * 2 - 1 < XResolution * 2 + 1 && y * 2 + 1 < ZResolution * 2 + 1)
-//            {
-//                foreach (var index in VerticesLocations[x * 2 - 1, y * 2 + 1])
-//                {
-//                    var h = (_vertices[VerticesLocations[x * 2 + 1, y * 2 + 1][0]].y + _vertices[VerticesLocations[x * 2 - 1, y * 2 + 1][0]].y) / 2f;
-//                    RaiseVertex(index, h);
-//
-//                    // RaiseVertex2(index, height);
-//                }
-//            }
         }
 
         private void RaiseVertex(int index, float height)
@@ -172,17 +148,7 @@ namespace Assets.Scripts
                 }
             }
         }
-        private void RaiseVertex2(int index, float height)
-        {
-            var heightAdd = height / 2f;
-            if (_vertices.Count > index)
-            {
-                if (Scale * height > _vertices[index].y)
-                {
-                    _vertices[index] = new Vector3(_vertices[index].x,  (_vertices[index].y + heightAdd * Scale), _vertices[index].z);
-                }
-            }
-        }
+
         private void ColorTile(int x, int y, Color color)
         {
             for (int i = x * 2; i <= x * 2 + 2; ++i)
@@ -230,9 +196,9 @@ namespace Assets.Scripts
             if (_vertexColors.Count == 0)
             {
                 for (int i = 0; i < _numberOfVertices; i++)
-            {
-                _vertexColors.Add(_baseColor);
-            }
+                {
+                    _vertexColors.Add(_baseColor);
+                }
             }
             if (_vertices.Count > index)
             {
