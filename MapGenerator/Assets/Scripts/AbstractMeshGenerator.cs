@@ -30,7 +30,7 @@ namespace Assets.Scripts
         protected MeshCollider _meshCollider;
         private Mesh mesh;
 
-       public Mesh GenerateMesh()
+       protected Mesh BuildMesh()
         {
 
             _meshRenderer.material = Material;
@@ -42,6 +42,7 @@ namespace Assets.Scripts
 
             return mesh;
         }
+        
 
         private bool ValidateMesh()
         {
@@ -94,27 +95,32 @@ namespace Assets.Scripts
 
             if (ValidateMesh())
             {
-                //This should always be done vertices first, triangles second - Unity requires this.
-                mesh.SetVertices(_vertices);
-                mesh.SetTriangles(_triangles, 0);
-
-                if (_normals.Count == 0)
-                {
-                    mesh.RecalculateNormals();
-                    _normals.AddRange(mesh.normals);
-                }
-
-
-                mesh.SetNormals(_normals);
-
-//                mesh.RecalculateTangents();
-                mesh.SetUVs(0, _uvs);
-                mesh.SetTangents(_tangents);
-                mesh.SetColors(_vertexColors);
-
-                _meshFilter.mesh = mesh;
-                _meshCollider.sharedMesh = mesh;
+                UpadteMesh();
             }
+        }
+
+        public void UpadteMesh()
+        {
+            //This should always be done vertices first, triangles second - Unity requires this.
+            mesh.SetVertices(_vertices);
+            mesh.SetTriangles(_triangles, 0);
+
+            if (_normals.Count == 0)
+            {
+                mesh.RecalculateNormals();
+                _normals.AddRange(mesh.normals);
+            }
+
+
+            mesh.SetNormals(_normals);
+
+            //                mesh.RecalculateTangents();
+            mesh.SetUVs(0, _uvs);
+            mesh.SetTangents(_tangents);
+            mesh.SetColors(_vertexColors);
+
+            _meshFilter.mesh = mesh;
+            _meshCollider.sharedMesh = mesh;
         }
 
         protected virtual void SetNormals() { }

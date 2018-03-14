@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public class MapGenerator : AbstractMeshGenerator
+    public class MapFrameBuilder : AbstractMeshGenerator
     {
         protected override string Name
         {
@@ -26,7 +26,15 @@ namespace Assets.Scripts
         private const int TriangleCornersInTriangle = 3;
         private readonly Color _baseColor = Color.yellow;
 
-        public MapGenerator(Vector3 location, int xResolution, int zResolution, float scale, Material material, MeshFilter meshFilter, MeshRenderer meshRenderer, MeshCollider meshCollider)
+        public MapFrameBuilder(
+            Vector3 location,
+            int xResolution,
+            int zResolution,
+            float scale,
+            Material material,
+            MeshFilter meshFilter,
+            MeshRenderer meshRenderer,
+            MeshCollider meshCollider)
         {
             Location = location;
             XResolution = xResolution;
@@ -37,7 +45,7 @@ namespace Assets.Scripts
             _meshCollider = meshCollider;
             _meshFilter = meshFilter;
         }
-        
+
 
         protected override void SetMeshNumbers()
         {
@@ -61,7 +69,7 @@ namespace Assets.Scripts
                 }
             }
         }
-        
+
         protected override void SetVertices()
         {
             var counter = 0;
@@ -101,122 +109,6 @@ namespace Assets.Scripts
                     _vertexColors.Add(_baseColor);
                 }
             }
-
-//            BuildMountain(20, 10, 5, 2);
-//            BuildMountain(20, 20, 8, 2);
-//            BuildMountain(20, 30, 5, 2);
-
-
-            SetYPositionOfMiddleVertices();
-        }
-
-        private void BuildMountain(int x, int y, int peakHeigh, int ringWidth)
-        {
-            var tileHeights = MountainBuilder.BuildMountain(x, y, peakHeigh, ringWidth);
-            foreach (var tileHeight in tileHeights)
-            {
-                RaiseTile(tileHeight.Key.x, tileHeight.Key.y, tileHeight.Value);
-            }
-        }
-
-        private void SetYPositionOfMiddleVertices()
-        {
-            for (var i = 0; i < _numberOfVertices; i += 5)
-            {
-                var middleVertice = i + 4;
-
-                var totalHeight = 0f;
-                for (var j = i; j < i + 4; j++)
-                {
-                    totalHeight += _vertices[j].y;
-                }
-
-                _vertices[middleVertice] = new Vector3(_vertices[middleVertice].x, totalHeight / 4f,
-                    _vertices[middleVertice].z);
-            }
-        }
-
-        private void RaiseTile(int x, int y, float height)
-        {
-            for (var i = x * 2; i <= x * 2 + 2; ++i)
-            {
-                for (var j = y * 2; j <= y * 2 + 2; ++j)
-                {
-                    foreach (var index in VerticesLocations[i, j])
-                    {
-                        RaiseVertex(index, height);
-                    }
-                }
-            }
-        }
-
-        private void RaiseVertex(int index, float height)
-        {
-            if (_vertices.Count > index)
-            {
-                if (Scale * height > _vertices[index].y)
-                {
-                    _vertices[index] = new Vector3(_vertices[index].x, Scale * height, _vertices[index].z);
-                }
-            }
-        }
-
-        private void ColorTile(int x, int y, Color color)
-        {
-            for (var i = x * 2; i <= x * 2 + 2; ++i)
-            {
-                for (var j = y * 2; j <= y * 2 + 2; ++j)
-                {
-                    foreach (var index in VerticesLocations[i, j])
-                    {
-                        ColorTile(index, color);
-                    }
-                }
-            }
-            if (x * 2 + 1 < XResolution * 2 + 1 && y * 2 - 1 < ZResolution * 2 + 1)
-            {
-                foreach (var index in VerticesLocations[x * 2 + 1, y * 2 - 1])
-                {
-                    ColorTile(index, color);
-                }
-            }
-            if (x * 2 + 1 < XResolution * 2 + 1 && y * 2 + 3 < ZResolution * 2 + 1)
-            {
-                foreach (var index in VerticesLocations[x * 2 + 1, y * 2 + 3])
-                {
-                    ColorTile(index, color);
-                }
-            }
-            if (x * 2 + 3 < XResolution * 2 + 1 && y * 2 + 1 < ZResolution * 2 + 1)
-            {
-                foreach (var index in VerticesLocations[x * 2 + 3, y * 2 + 1])
-                {
-                    ColorTile(index, color);
-                }
-            }
-            if (x * 2 - 1 < XResolution * 2 + 1 && y * 2 + 1 < ZResolution * 2 + 1)
-            {
-                foreach (var index in VerticesLocations[x * 2 - 1, y * 2 + 1])
-                {
-                    ColorTile(index, color);
-                }
-            }
-        }
-
-        private void ColorTileExact(int x, int y, Color color)
-        {
-            foreach (var index in VerticesLocations[x * 2 + 1, y * 2 + 1])
-            {
-                ColorTile(index, color);
-            }
-        }
-
-        private void ColorTile(int index, Color color)
-        {
-            if (_vertices.Count > index)
-            {
-                _vertexColors[index] = color;
-            }
         }
 
         protected override void SetTriangles()
@@ -249,6 +141,22 @@ namespace Assets.Scripts
 
         protected override void SetVertexColours()
         {
+        }
+
+        public IMap Build()
+        {
+            BuildMesh();
+            var callback = new Action(() => UpadteMesh());
+
+            return new Map(
+                XResolution,
+                ZResolution,
+                Scale,
+                VerticesLocations,
+                _vertices,
+                _vertexColors,
+                _numberOfVertices,
+                callback);
         }
     }
 }

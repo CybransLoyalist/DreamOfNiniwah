@@ -4,7 +4,7 @@ namespace Assets.Scripts
 {
     [RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshRenderer)), RequireComponent(typeof(MeshCollider))]
     [ExecuteInEditMode]
-    public class MapGenerator2 : MonoBehaviour
+    public class MapGenerator : MonoBehaviour
     {
         [SerializeField] protected Material Material;
         [SerializeField] private Vector3 Location;
@@ -12,27 +12,28 @@ namespace Assets.Scripts
         [SerializeField] [Range(1, 255)] private int ZResolution;
         [SerializeField] [Range(0, 1000)] private float Scale = 1f;
 
-        private MeshFilter _meshFilter;
-        protected MeshRenderer _meshRenderer;
-        private MeshCollider _meshCollider;
-        private Mesh mesh;
-
         void Update()
         {
-            _meshFilter = GetComponent<MeshFilter>();
-            _meshRenderer = GetComponent<MeshRenderer>();
-            _meshCollider = GetComponent<MeshCollider>();
+            GenerateMap();
+        }
 
-            var mesh = new MapGenerator(
+        private void GenerateMap()
+        {
+            var map = new MapFrameBuilder(
                 Location,
                 XResolution,
                 ZResolution,
                 Scale,
                 Material,
-                _meshFilter,
-                _meshRenderer,
-                _meshCollider).GenerateMesh();
-        }
+                GetComponent<MeshFilter>(),
+                GetComponent<MeshRenderer>(),
+                GetComponent<MeshCollider>()).Build();
 
+            map.BuildMountain(20, 10, 5, 2);
+            map.BuildMountain(20, 20, 8, 2);
+            map.BuildMountain(20, 30, 5, 2);
+
+            map.CommitChanges();
+        }
     }
 }
