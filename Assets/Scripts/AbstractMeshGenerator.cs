@@ -4,11 +4,9 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-    [RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshRenderer)),RequireComponent(typeof(MeshCollider))]
-    [ExecuteInEditMode]
-    public abstract class AbstractMeshGenerator : MonoBehaviour
+    public abstract class AbstractMeshGenerator 
     {
-        [SerializeField] protected Material Material;
+        protected Material Material;
         protected abstract string Name { get; }
 
         protected List<Vector3> _vertices;
@@ -27,16 +25,13 @@ namespace Assets.Scripts
         protected List<Vector2> _uvs;
         protected List<Color32> _vertexColors;
 
-        private MeshFilter _meshFilter;
+        protected MeshFilter _meshFilter;
         protected MeshRenderer _meshRenderer;
-        private MeshCollider _meshCollider;
+        protected MeshCollider _meshCollider;
         private Mesh mesh;
 
-        void Update()
+       public Mesh GenerateMesh()
         {
-            _meshFilter = GetComponent<MeshFilter>();
-            _meshRenderer = GetComponent<MeshRenderer>();
-            _meshCollider = GetComponent<MeshCollider>();
 
             _meshRenderer.material = Material;
             
@@ -44,6 +39,8 @@ namespace Assets.Scripts
             SetMeshNumbers();
             
             CreateMesh();
+
+            return mesh;
         }
 
         private bool ValidateMesh()

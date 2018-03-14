@@ -11,10 +11,10 @@ namespace Assets.Scripts
             get { return "Map"; }
         }
 
-        [SerializeField] private Vector3 Location;
-        [SerializeField] [Range(1, 255)] private int XResolution;
-        [SerializeField] [Range(1, 255)] private int ZResolution;
-        [SerializeField] [Range(0, 1000)] private float Scale = 1f;
+        private Vector3 Location;
+        private int XResolution;
+        private int ZResolution;
+        private float Scale = 1f;
 
         private int TilesCount;
         private int VerticesXCount;
@@ -25,6 +25,19 @@ namespace Assets.Scripts
         private const int TrianglesPerTile = 4;
         private const int TriangleCornersInTriangle = 3;
         private readonly Color _baseColor = Color.yellow;
+
+        public MapGenerator(Vector3 location, int xResolution, int zResolution, float scale, Material material, MeshFilter meshFilter, MeshRenderer meshRenderer, MeshCollider meshCollider)
+        {
+            Location = location;
+            XResolution = xResolution;
+            ZResolution = zResolution;
+            Scale = scale;
+            Material = material;
+            _meshRenderer = meshRenderer;
+            _meshCollider = meshCollider;
+            _meshFilter = meshFilter;
+        }
+        
 
         protected override void SetMeshNumbers()
         {
@@ -48,7 +61,7 @@ namespace Assets.Scripts
                 }
             }
         }
-
+        
         protected override void SetVertices()
         {
             var counter = 0;
@@ -89,9 +102,9 @@ namespace Assets.Scripts
                 }
             }
 
-            BuildMountain(20, 10, 5, 2);
-            BuildMountain(20, 20, 8, 2);
-            BuildMountain(20, 30, 5, 2);
+//            BuildMountain(20, 10, 5, 2);
+//            BuildMountain(20, 20, 8, 2);
+//            BuildMountain(20, 30, 5, 2);
 
 
             SetYPositionOfMiddleVertices();
