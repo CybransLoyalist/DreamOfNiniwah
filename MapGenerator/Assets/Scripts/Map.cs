@@ -58,24 +58,30 @@ namespace Assets.Scripts
 
         public void ColorTile(int x, int y, Color color)
         {
-            var tileVertices = GetAllVerticesOfTile(x, y);
-            foreach (var index in tileVertices)
+            if (IsValidPointOnMap(x, y))
             {
-                ColorTile(index, color);
-            }
+                var tileVertices = GetAllVerticesOfTile(x, y);
+                foreach (var index in tileVertices)
+                {
+                    ColorTile(index, color);
+                }
 
-            var neighbours = GetNeighbours(x, y);
-            foreach (var neighbour in neighbours)
-            {
-                var middleVertex = GetMiddleVertexOfTile(neighbour.x, neighbour.y);
-                ColorTile(middleVertex, color);
+                var neighbours = GetNeighbours(x, y);
+                foreach (var neighbour in neighbours)
+                {
+                    var middleVertex = GetMiddleVertexOfTile(neighbour.x, neighbour.y);
+                    ColorTile(middleVertex, color);
+                }
             }
         }
 
         public void ColorTileExact(int x, int y, Color color)
         {
-            var middleVertex = GetMiddleVertexOfTile(x, y);
-            ColorTile(middleVertex, color);
+            if (IsValidPointOnMap(x, y))
+            {
+                var middleVertex = GetMiddleVertexOfTile(x, y);
+                ColorTile(middleVertex, color);
+            }
         }
 
         private List<int> GetAllVerticesOfTile(int x, int y)
@@ -132,7 +138,7 @@ namespace Assets.Scripts
 
         public void BuildMountain(int x, int y, int peakHeigh, int ringWidth)
         {
-            var tileHeights = MountainBuilder.BuildMountain(x, y, peakHeigh, ringWidth);
+            var tileHeights = MountainBuilder.BuildMountain(x, y, peakHeigh, ringWidth, _xResolution, _zResolution);
             foreach (var tileHeight in tileHeights)
             {
                 RaiseTile(tileHeight.Key.x, tileHeight.Key.y, tileHeight.Value);
@@ -160,6 +166,11 @@ namespace Assets.Scripts
         {
             SetYPositionOfMiddleVertices();
             _commitChangesCallback();
+        }
+
+        private bool IsValidPointOnMap(int x, int y)
+        {
+            return MapOperationValidator.IsValidPointOnMap(x, y, _xResolution, _zResolution);
         }
     }
 }

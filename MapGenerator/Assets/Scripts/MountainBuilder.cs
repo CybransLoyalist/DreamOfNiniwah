@@ -6,10 +6,9 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-
     public class MountainBuilder
     {
-        public static Dictionary<Vector2Int, float> BuildMountain(int x, int y, int peakHeight, int ringWidth)
+        public static Dictionary<Vector2Int, float> BuildMountain(int x, int y, int peakHeight, int ringWidth, int maxX, int maxZ)
         {
             var result = new Dictionary<Vector2Int, float>();
             
@@ -29,7 +28,10 @@ namespace Assets.Scripts
                 var ringToBeRaised = MapPiecesSelector.GetRingAround(x, y, ringBeginning, ringWidth);
                 foreach (var tile in ringToBeRaised)
                 {
-                    result.Add(tile, level);
+                    if(MapOperationValidator.IsValidPointOnMap(tile.x, tile.y, maxX, maxZ))
+                    {
+                        result.Add(tile, level);
+                    }
                 }
                 ringBeginning += ringWidth;
                 level--;
