@@ -32,12 +32,7 @@ namespace Assets.Scripts
                     GetComponent<MeshRenderer>(),
                     GetComponent<MeshCollider>()).Build();
 
-//                map.BuildMountain(20, 10, 8, 2);
-                map.BuildMountain(20, 20, 8, 2);
-//                map.BuildMountain(20, 30, 5, 2);
-
-                //map.BuildHollow(20, 10, 5, 2);
-
+                map.BuildMountain(20, 30, 5, 2);
 
                 map.CommitChanges();
             }

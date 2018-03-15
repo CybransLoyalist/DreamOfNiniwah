@@ -45,11 +45,31 @@ namespace Assets.Scripts
             }
         }
 
+        private void LowerTile(int x, int y, float height)
+        {
+            var vertices = GetAllVerticesOfTile(x, y);
+            foreach (var vertex in vertices)
+            {
+                LowerVertex(vertex, height);
+            }
+        }
+
         private void RaiseVertex(int index, float height)
         {
             if (_vertices.Count > index)
             {
                 if (_scale * height > _vertices[index].y)
+                {
+                    _vertices[index] = new Vector3(_vertices[index].x, _scale * height, _vertices[index].z);
+                }
+            }
+        }
+
+        private void LowerVertex(int index, float height)
+        {
+            if (_vertices.Count > index)
+            {
+                if (_scale * height < _vertices[index].y)
                 {
                     _vertices[index] = new Vector3(_vertices[index].x, _scale * height, _vertices[index].z);
                 }
@@ -138,10 +158,30 @@ namespace Assets.Scripts
 
         public void BuildMountain(int x, int y, int peakHeigh, int ringWidth)
         {
+            if (peakHeigh <= 0)
+            {
+                Debug.LogWarning("Building mountain with 0 or lower peak height");
+                return;
+            }
             var tileHeights = MountainBuilder.BuildMountain(x, y, peakHeigh, ringWidth, _xResolution, _zResolution);
             foreach (var tileHeight in tileHeights)
             {
                 RaiseTile(tileHeight.Key.x, tileHeight.Key.y, tileHeight.Value);
+            }
+        }
+
+        public void BuildHollow(int x, int y, int bottomDepth, int ringWidth)
+        {
+            if (bottomDepth >= 0)
+            {
+                Debug.LogWarning("Building hollow with 0 or higher bottom depth.");
+                return;
+            }
+
+            var tileHeights = MountainBuilder.BuildHollow(x, y, bottomDepth, ringWidth, _xResolution, _zResolution);
+            foreach (var tileHeight in tileHeights)
+            {
+                LowerTile(tileHeight.Key.x, tileHeight.Key.y, tileHeight.Value);
             }
         }
 
