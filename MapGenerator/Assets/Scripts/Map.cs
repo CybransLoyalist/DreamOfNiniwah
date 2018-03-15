@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -17,12 +18,12 @@ namespace Assets.Scripts
 
         public Map(
             int xResolution,
-            int zResolution, 
-            float scale, 
+            int zResolution,
+            float scale,
             List<int>[,] verticesLocations,
             List<Vector3> vertices,
-            List<Color32> vertexColors, 
-            int numberOfVertices, 
+            List<Color32> vertexColors,
+            int numberOfVertices,
             Action commitChangesCallback)
         {
             _xResolution = xResolution;
@@ -35,18 +36,12 @@ namespace Assets.Scripts
             _commitChangesCallback = commitChangesCallback;
         }
 
-
         private void RaiseTile(int x, int y, float height)
         {
-            for (var i = x * 2; i <= x * 2 + 2; ++i)
+            var vertices = GetAllVerticesOfTile(x, y);
+            foreach (var vertex in vertices)
             {
-                for (var j = y * 2; j <= y * 2 + 2; ++j)
-                {
-                    foreach (var index in _verticesLocations[i, j])
-                    {
-                        RaiseVertex(index, height);
-                    }
-                }
+                RaiseVertex(vertex, height);
             }
         }
 
@@ -61,54 +56,70 @@ namespace Assets.Scripts
             }
         }
 
-        private void ColorTile(int x, int y, Color color)
+        public void ColorTile(int x, int y, Color color)
         {
+            var tileVertices = GetAllVerticesOfTile(x, y);
+            foreach (var index in tileVertices)
+            {
+                ColorTile(index, color);
+            }
+
+            var neighbours = GetNeighbours(x, y);
+            foreach (var neighbour in neighbours)
+            {
+                var middleVertex = GetMiddleVertexOfTile(neighbour.x, neighbour.y);
+                ColorTile(middleVertex, color);
+            }
+        }
+
+        public void ColorTileExact(int x, int y, Color color)
+        {
+            var middleVertex = GetMiddleVertexOfTile(x, y);
+            ColorTile(middleVertex, color);
+        }
+
+        private List<int> GetAllVerticesOfTile(int x, int y)
+        {
+            var result = new List<int>();
             for (var i = x * 2; i <= x * 2 + 2; ++i)
             {
                 for (var j = y * 2; j <= y * 2 + 2; ++j)
                 {
                     foreach (var index in _verticesLocations[i, j])
                     {
-                        ColorTile(index, color);
+                        result.Add(index);
                     }
                 }
             }
-            if (x * 2 + 1 < _xResolution * 2 + 1 && y * 2 - 1 < _zResolution * 2 + 1)
-            {
-                foreach (var index in _verticesLocations[x * 2 + 1, y * 2 - 1])
-                {
-                    ColorTile(index, color);
-                }
-            }
-            if (x * 2 + 1 < _xResolution * 2 + 1 && y * 2 + 3 < _zResolution * 2 + 1)
-            {
-                foreach (var index in _verticesLocations[x * 2 + 1, y * 2 + 3])
-                {
-                    ColorTile(index, color);
-                }
-            }
-            if (x * 2 + 3 < _xResolution * 2 + 1 && y * 2 + 1 < _zResolution * 2 + 1)
-            {
-                foreach (var index in _verticesLocations[x * 2 + 3, y * 2 + 1])
-                {
-                    ColorTile(index, color);
-                }
-            }
-            if (x * 2 - 1 < _xResolution * 2 + 1 && y * 2 + 1 < _zResolution * 2 + 1)
-            {
-                foreach (var index in _verticesLocations[x * 2 - 1, y * 2 + 1])
-                {
-                    ColorTile(index, color);
-                }
-            }
+
+            return result;
         }
 
-        private void ColorTileExact(int x, int y, Color color)
+        private List<Vector2Int> GetNeighbours(int x, int y)
         {
-            foreach (var index in _verticesLocations[x * 2 + 1, y * 2 + 1])
+            var result = new List<Vector2Int>();
+            if (x - 1 >= 0)
             {
-                ColorTile(index, color);
+                result.Add(new Vector2Int(x-1, y));
             }
+            if (x + 1 < _xResolution)
+            {
+                result.Add(new Vector2Int(x+1, y));
+            }
+            if (y - 1 >= 0)
+            {
+                result.Add(new Vector2Int(x, y - 1));
+            }
+            if (y + 1 < _zResolution)
+            {
+                result.Add(new Vector2Int(x, y + 1));
+            }
+            return result;
+        }
+
+        private int GetMiddleVertexOfTile(int x, int y)
+        {
+            return _verticesLocations[x * 2 + 1, y * 2 + 1].First();
         }
 
         private void ColorTile(int index, Color color)
@@ -127,7 +138,6 @@ namespace Assets.Scripts
                 RaiseTile(tileHeight.Key.x, tileHeight.Key.y, tileHeight.Value);
             }
         }
-
 
         public void SetYPositionOfMiddleVertices()
         {

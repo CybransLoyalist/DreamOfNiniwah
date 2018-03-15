@@ -33,6 +33,8 @@ namespace Assets.Scripts
             map.BuildMountain(20, 20, 8, 2);
             map.BuildMountain(20, 30, 5, 2);
 
+            map.ColorTile(20, 20, Color.red);
+            map.ColorTileExact(20, 30, Color.black);
             map.CommitChanges();
         }
     }
