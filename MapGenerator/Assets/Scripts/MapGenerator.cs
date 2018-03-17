@@ -7,18 +7,18 @@ namespace Assets.Scripts
     [ExecuteInEditMode]
     public class MapGenerator : MonoBehaviour
     {
-        [SerializeField] protected Material Material;
-        [SerializeField] private Vector3 Location;
-        [SerializeField] [Range(1, 255)] private int XResolution;
-        [SerializeField] [Range(1, 255)] private int ZResolution;
-        [SerializeField] [Range(0, 1000)] private float Scale = 1f;
+        [SerializeField] public Material Material;
+        [SerializeField] public Vector3 Location;
+        [SerializeField] [Range(1, 255)] public int XResolution;
+        [SerializeField] [Range(1, 255)] public int ZResolution;
+        [SerializeField] [Range(0, 1000)] public float Scale = 1f;
 
-        void Update()
-        {
-            GenerateMap();
-        }
+//        void Update()
+//        {
+//            GenerateMap();
+//        }
 
-        private void GenerateMap()
+        public void GenerateMap()
         {
             try
             {
