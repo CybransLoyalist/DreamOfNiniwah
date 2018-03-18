@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
@@ -9,5 +10,10 @@ namespace Assets.Scripts
 
         void BuildMountain(int x, int y, int peakHeigh, int ringWidth);
         void BuildHollow(int x, int y, int peakHeigh, int ringWidth);
+        List<Tile> GetNeighbours(Tile tile,  NeighbourMode neighbourMode = NeighbourMode.Orthogonal);
+
+        int ZResolution { get; }
+        int XResolution { get; }
+        void RaiseTile(int x, int y, float height);
     }
 }

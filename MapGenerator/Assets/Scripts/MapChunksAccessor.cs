@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
@@ -14,42 +15,33 @@ namespace Assets.Scripts
             AllTileVertices = new Dictionary<Tile, List<Vertex>>();
         }
 
-        public void Recalculate()
+        public void Recalculate(IMap map)
         {
             foreach (var tileVertex in OwnTileVertices)
             {
                 AllTileVertices[tileVertex.Key] = tileVertex.Value.ToList();
             }
 
-            foreach (var tileVertex1 in AllTileVertices)
-            {
-                var tile = tileVertex1.Key;
-                var neighbours = OwnTileVertices.Where(a =>
-                    a.Key.X == tile.X - 1 && a.Key.Z == tile.Z ||
-                    a.Key.X == tile.X + 1 && a.Key.Z == tile.Z ||
-                    a.Key.X == tile.X  && a.Key.Z == tile.Z + 1 ||
-                    a.Key.X == tile.X && a.Key.Z == tile.Z - 1 ||
-
-                    a.Key.X == tile.X - 1 && a.Key.Z == tile.Z - 1 ||
-                    a.Key.X == tile.X - 1 && a.Key.Z == tile.Z + 1 ||
-                    a.Key.X == tile.X + 1 && a.Key.Z == tile.Z - 1 ||
-                    a.Key.X == tile.X + 1 && a.Key.Z == tile.Z + 1 );
-
-                foreach (var keyValuePair in neighbours)
-                {
-                    foreach (var vertex in keyValuePair.Value)
-                    {
-                        if (tileVertex1.Value.Any(a => a.Vector3 == vertex.Vector3))
-                        {
-                            if (!tileVertex1.Value.Contains(vertex))
-                            {
-                                tileVertex1.Value.Add(vertex);
-                            }
-                        }
-                    }
-                }
-
-            }
+//            foreach (var tileVertex1 in AllTileVertices)
+//            {
+//                var tile = tileVertex1.Key;
+//                var neighbours = map.GetNeighbours(tile, NeighbourMode.All);
+//
+//                foreach (var neighbour in neighbours)
+//                {
+//                    foreach (var vertex in OwnTileVertices[neighbour])
+//                    {
+//                        if (tileVertex1.Value.Any(a => a.Location == vertex.Location))
+//                        {
+//                            if (!tileVertex1.Value.Contains(vertex))
+//                            {
+//                                tileVertex1.Value.Add(vertex);
+//                            }
+//                        }
+//                    }
+//                }
+//
+//            }
 
         }
     }

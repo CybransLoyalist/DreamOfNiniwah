@@ -1,7 +1,18 @@
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Assets.Scripts
 {
+    public class RandomMapGenerator
+    {
+        public void GenerateFor(IMap map)
+        {
+            map.BuildMountain(10, 10, 6, 2);
+//            map.ColorTileExact(1,1, Color.magenta);
+            map.ColorTile(1,1, Color.green);
+            map.RaiseTile(1,1, 1f);
+        }
+    }
     public class GameMapGenerator : MonoBehaviour
     {
 
@@ -12,10 +23,15 @@ namespace Assets.Scripts
 
         [SerializeField] private float meshScale = 1;
         
-        private const int MaxResolutionOfSingleChunk = 10;
+        private const int MaxResolutionOfSingleChunk = 25;
 
         void Awake()
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var time1 = stopwatch.ElapsedMilliseconds;
+            print("time1 " + time1);
+
             var chunksCountX = (int)Mathf.Ceil((float) xResolution / MaxResolutionOfSingleChunk);
             int chunkSizeX = xResolution / chunksCountX;
 
@@ -23,12 +39,13 @@ namespace Assets.Scripts
             int chunkSizeZ = zResolution / chunksCountZ;
 
             var chunks = new MapChunk[chunksCountX, chunksCountZ];
-
+            
             var MapChunksAccessor = new MapChunksAccessor();
             var map = new Map(
                 xResolution,
                 zResolution,
                 MapChunksAccessor);
+            
 
             for (int i = 0; i < chunksCountX; i++)
             {
@@ -38,18 +55,22 @@ namespace Assets.Scripts
                    
                 }
             }
-            map.BuildMountain(10,10, 6,2);
-            map.ColorTileExact(-8,8, Color.magenta);
-            map.ColorTile(10, 10, Color.green);
-//            map.RaiseTile(10, 10, 1f);
-//            map.LowerTile(5,5, -1f);
-//            map.BuildHollow(10,10, -2,2);
 
 
+
+           
+            MapChunksAccessor.Recalculate(map);
+
+            var randomMapGenerator = new RandomMapGenerator();
+            randomMapGenerator.GenerateFor(map);
+            
             foreach (var mapChunk in chunks)
             {
                 mapChunk.CommitChanges();
             }
+
+            var time2 = stopwatch.ElapsedMilliseconds;
+            print("time2 " + time2);
         }
 
         private MapChunk CreateTerrainChunk(int i, int j, Map map, MapChunksAccessor MapChunksAccessor, Vector2 location, int chunkSizeX, int chunkSizeZ)

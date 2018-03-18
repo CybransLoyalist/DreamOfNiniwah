@@ -7,28 +7,28 @@ namespace Assets.Scripts
 {
     public class Map : IMap
     {
-        private readonly int _zResolution;
-        private readonly int _xResolution;
+        public int ZResolution { get; private set; }
+        public int XResolution {get; private set; }
         public Dictionary<Vector2Int, Tile> Tiles;
-        public MapChunksAccessor MapChunksAccessor;
+        private readonly MapChunksAccessor _mapChunksAccessor;
 
         public Map(
             int xResolution,
             int zResolution,
-            MapChunksAccessor MapChunksAccessor)
+            MapChunksAccessor mapChunksAccessor)
         {
-            _xResolution = xResolution;
-            _zResolution = zResolution;
-            this.MapChunksAccessor = MapChunksAccessor;
+            XResolution = xResolution;
+            ZResolution = zResolution;
+            _mapChunksAccessor = mapChunksAccessor;
 
             Tiles = new Dictionary<Vector2Int, Tile>();
             for (int x = 0; x < xResolution; x++)
             {
-                for (int z = 0; z < _zResolution; z++)
+                for (int z = 0; z < ZResolution; z++)
                 {
                     var tile = new Tile() {X = x, Z = z};
                     Tiles[new Vector2Int(x, z)] = tile;
-                    MapChunksAccessor.OwnTileVertices[tile] = new List<Vertex>();
+                    mapChunksAccessor.OwnTileVertices[tile] = new List<Vertex>();
                 }
             }
         }
@@ -38,7 +38,7 @@ namespace Assets.Scripts
             if (IsValidPointOnMap(x, y))
             {
                 var tile = Tiles[new Vector2Int(x, y)];
-                foreach (var tileVertex in MapChunksAccessor.OwnTileVertices[tile])
+                foreach (var tileVertex in _mapChunksAccessor.OwnTileVertices[tile])
                 {
                     tileVertex.SetColor(color);
                 }
@@ -50,7 +50,7 @@ namespace Assets.Scripts
             if (IsValidPointOnMap(x, y))
             {
                 var tile = Tiles[new Vector2Int(x, y)];
-                foreach (var tileVertex in MapChunksAccessor.AllTileVertices[tile])
+                foreach (var tileVertex in _mapChunksAccessor.AllTileVertices[tile])
                 {
                     tileVertex.Raise(height);
                 }
@@ -62,7 +62,7 @@ namespace Assets.Scripts
             if (IsValidPointOnMap(x, y))
             {
                 var tile = Tiles[new Vector2Int(x, y)];
-                foreach (var tileVertex in MapChunksAccessor.AllTileVertices[tile])
+                foreach (var tileVertex in _mapChunksAccessor.AllTileVertices[tile])
                 {
                     tileVertex.Lower(height);
                 }
@@ -74,15 +74,15 @@ namespace Assets.Scripts
             if (IsValidPointOnMap(x, y))
             {
                 var tile = Tiles[new Vector2Int(x, y)];
-                foreach (var tileVertex in MapChunksAccessor.AllTileVertices[tile])
+                foreach (var tileVertex in _mapChunksAccessor.OwnTileVertices[tile])
                 {
                     tileVertex.SetColor(color);
                 }
 
-                foreach (var neighbour in GetNeighbours(tile.X, tile.Z))
-                {
-                    ColorMiddleVertexOfTile(neighbour.X, neighbour.Z, color);
-                }
+//                foreach (var neighbour in GetNeighbours(tile))
+//                {
+//                    ColorMiddleVertexOfTile(neighbour.X, neighbour.Z, color);
+//                }
             }
         }
 
@@ -94,7 +94,7 @@ namespace Assets.Scripts
                 Debug.LogWarning("Building mountain with 0 or lower peak height");
                 return;
             }
-            var tileHeights = MountainBuilder.BuildMountain(x, y, peakHeigh, ringWidth, _xResolution, _zResolution);
+            var tileHeights = MountainBuilder.BuildMountain(x, y, peakHeigh, ringWidth, XResolution, ZResolution);
             foreach (var tileHeight in tileHeights)
             {
                 RaiseTile(tileHeight.Key.x, tileHeight.Key.y, tileHeight.Value);
@@ -108,7 +108,7 @@ namespace Assets.Scripts
                 Debug.LogWarning("Building hollow with 0 or higher depth");
                 return;
             }
-            var tileHeights = MountainBuilder.BuildHollow(x, y, bottomDepth, ringWidth, _xResolution, _zResolution);
+            var tileHeights = MountainBuilder.BuildHollow(x, y, bottomDepth, ringWidth, XResolution, ZResolution);
             foreach (var tileHeight in tileHeights)
             {
                 RaiseTile(tileHeight.Key.x, tileHeight.Key.y, tileHeight.Value);
@@ -119,55 +119,62 @@ namespace Assets.Scripts
         {
             var tile = Tiles[new Vector2Int(x, y)];
 
-            var middleVertex = MapChunksAccessor.AllTileVertices[tile].First(a => a.IsMiddle);
+            var middleVertex = _mapChunksAccessor.AllTileVertices[tile].First(a => a.IsMiddle);
             middleVertex.SetColor(color);
         }
 
-        private List<Tile> GetNeighbours(int x, int y, NeighbourMode neighbourMode = NeighbourMode.Orthogonal)
+        private readonly Dictionary<Tile, List<Tile>> _neighboursRelations = new Dictionary<Tile, List<Tile>>();
+        public List<Tile> GetNeighbours(Tile tile, NeighbourMode neighbourMode = NeighbourMode.Orthogonal)
         {
-            var result = new List<Tile>();
-            if (x - 1 >= 0)
+            if (!_neighboursRelations.ContainsKey(tile))
             {
-                result.Add(Tiles[new Vector2Int(x - 1, y)]);
-            }
-            if (x + 1 < _xResolution)
-            {
-                result.Add(Tiles[new Vector2Int(x + 1, y)]);
-            }
-            if (y - 1 >= 0)
-            {
-                result.Add(Tiles[new Vector2Int(x, y - 1)]);
-            }
-            if (y + 1 < _zResolution)
-            {
-                result.Add(Tiles[new Vector2Int(x, y + 1)]);
-            }
-            if (neighbourMode == NeighbourMode.All)
-            {
-                if (x - 1 >= 0 && y - 1 >= 0)
+                var x = tile.X;
+                var y = tile.Z;
+                var result = new List<Tile>();
+                if (x - 1 >= 0)
                 {
-                    result.Add(Tiles[new Vector2Int(x - 1, y - 1)]);
+                    result.Add(Tiles[new Vector2Int(x - 1, y)]);
                 }
-                if (x + 1 < _xResolution && y + 1 < _zResolution)
+                if (x + 1 < XResolution)
                 {
-                    result.Add(Tiles[new Vector2Int(x + 1, y + 1)]);
+                    result.Add(Tiles[new Vector2Int(x + 1, y)]);
                 }
-                if (x + 1 < _xResolution && y - 1 >= 0)
+                if (y - 1 >= 0)
                 {
-                    result.Add(Tiles[new Vector2Int(x + 1, y - 1)]);
+                    result.Add(Tiles[new Vector2Int(x, y - 1)]);
                 }
-                if (x - 1 >= 0 && y + 1 < _zResolution)
+                if (y + 1 < ZResolution)
                 {
-                    result.Add(Tiles[new Vector2Int(x - 1, y + 1)]);
+                    result.Add(Tiles[new Vector2Int(x, y + 1)]);
                 }
-            }
+                if (neighbourMode == NeighbourMode.All)
+                {
+                    if (x - 1 >= 0 && y - 1 >= 0)
+                    {
+                        result.Add(Tiles[new Vector2Int(x - 1, y - 1)]);
+                    }
+                    if (x + 1 < XResolution && y + 1 < ZResolution)
+                    {
+                        result.Add(Tiles[new Vector2Int(x + 1, y + 1)]);
+                    }
+                    if (x + 1 < XResolution && y - 1 >= 0)
+                    {
+                        result.Add(Tiles[new Vector2Int(x + 1, y - 1)]);
+                    }
+                    if (x - 1 >= 0 && y + 1 < ZResolution)
+                    {
+                        result.Add(Tiles[new Vector2Int(x - 1, y + 1)]);
+                    }
+                }
 
-            return result;
+                _neighboursRelations[tile] = result;
+            }
+            return _neighboursRelations[tile]; ;
         }
 
         private bool IsValidPointOnMap(int x, int y)
         {
-            return MapOperationValidator.IsValidPointOnMap(x, y, _xResolution, _zResolution);
+            return MapOperationValidator.IsValidPointOnMap(x, y, XResolution, ZResolution);
         }
     }
 }

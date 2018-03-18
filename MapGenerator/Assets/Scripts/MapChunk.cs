@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -28,7 +29,7 @@ namespace Assets.Scripts
         private Map _map;
         private int _i;
         private int _j;
-        private MapChunksAccessor _MapChunksAccessor;
+        private readonly MapChunksAccessor _mapChunksAccessor;
 
         public MapChunk(
             Vector3 location,
@@ -39,9 +40,10 @@ namespace Assets.Scripts
             MeshFilter meshFilter,
             MeshRenderer meshRenderer,
             MeshCollider meshCollider,
-            int i, int j,
+            int i, 
+            int j,
             Map map,
-            MapChunksAccessor MapChunksAccessor)
+            MapChunksAccessor mapChunksAccessor)
         {
             Location = location;
             XResolution = xResolution;
@@ -56,7 +58,7 @@ namespace Assets.Scripts
             XLocationAmongstChunks = _i;
             ZLocationAmongstChunks = _j;
             _map = map;
-            _MapChunksAccessor = MapChunksAccessor;
+            _mapChunksAccessor = mapChunksAccessor;
         }
 
 
@@ -85,6 +87,7 @@ namespace Assets.Scripts
 
         protected override void SetVertices()
         {
+
             var counter = 0;
             for (var z = 0; z < ZResolution; z++)
             {
@@ -105,26 +108,113 @@ namespace Assets.Scripts
                     VerticesLocations[x * 2 + 2, z * 2].Add(counter + 3);
                     VerticesLocations[x * 2 + 1, z * 2 + 1].Add(counter + 4);
 
-                    var mapTile = _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)];
-                    _map.MapChunksAccessor.OwnTileVertices[mapTile].Add(new Vertex() {Chunk = this, Index = counter});
 
+                    var tileGlobalLocation = new Vector2Int(_i * XResolution + x, _j * ZResolution + z);
 
+                    var mapTile = _map.Tiles[tileGlobalLocation];
 
-                    _MapChunksAccessor.OwnTileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 1});
-                    _MapChunksAccessor.OwnTileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 2});
-                    _MapChunksAccessor.OwnTileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 3});
-                    _MapChunksAccessor.OwnTileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {IsMiddle = true, Chunk = this, Index = counter + 4});
+                    _mapChunksAccessor.OwnTileVertices[mapTile].Add(new Vertex() { Chunk = this, Index = counter });
+                    _mapChunksAccessor.OwnTileVertices[mapTile].Add(new Vertex() { Chunk = this, Index = counter + 1 });
+                    _mapChunksAccessor.OwnTileVertices[mapTile].Add(new Vertex() { Chunk = this, Index = counter + 2 });
+                    _mapChunksAccessor.OwnTileVertices[mapTile].Add(new Vertex() { Chunk = this, Index = counter + 3 });
+                    _mapChunksAccessor.OwnTileVertices[mapTile].Add(new Vertex() { IsMiddle = true, Chunk = this, Index = counter + 4 });
 
                     _vertices.Add(vertex00);
                     _vertices.Add(vertex01);
                     _vertices.Add(vertex11);
                     _vertices.Add(vertex10);
                     _vertices.Add(vertexMiddle);
+
+                   
+                    //left
+                    if (tileGlobalLocation.x > 0)
+                    {
+                        var leftTileLocation = new Vector2Int(tileGlobalLocation.x - 1, tileGlobalLocation.y);
+                        var leftTile = _map.Tiles[leftTileLocation];
+
+                        _mapChunksAccessor.OwnTileVertices[leftTile].Add(new Vertex() { Chunk = this, Index = counter });
+                        _mapChunksAccessor.OwnTileVertices[leftTile].Add(new Vertex() { Chunk = this, Index = counter + 1 });
+                    }
+
+                    //top
+                    if (tileGlobalLocation.y < _map.ZResolution - 1)
+                    {
+                        var toptileocation = new Vector2Int(tileGlobalLocation.x , tileGlobalLocation.y + 1);
+                        var topTile = _map.Tiles[toptileocation];
+
+                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter + 1 });
+                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter + 2 });
+                    }
+
+                    //right
+                    if (tileGlobalLocation.x < _map.XResolution - 1)
+                    {
+                        var toptileocation = new Vector2Int(tileGlobalLocation.x + 1 , tileGlobalLocation.y );
+                        var topTile = _map.Tiles[toptileocation];
+
+                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter + 2 });
+                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter + 3 });
+                    }
+
+                    //bottom
+                    if (tileGlobalLocation.y > 0)
+                    {
+                        var toptileocation = new Vector2Int(tileGlobalLocation.x  , tileGlobalLocation.y -1 );
+                        var topTile = _map.Tiles[toptileocation];
+
+                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter  });
+                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter + 3 });
+                    }
+
+                    //topleft
+                    if (tileGlobalLocation.x > 0 && tileGlobalLocation.y < _map.ZResolution - 1)
+                    {
+                        var leftTileLocation = new Vector2Int(tileGlobalLocation.x - 1, tileGlobalLocation.y + 1);
+                        var leftTile = _map.Tiles[leftTileLocation];
+                        
+                        _mapChunksAccessor.OwnTileVertices[leftTile].Add(new Vertex() { Chunk = this, Index = counter + 1 });
+                    }
+
+                    //top right
+                    if (tileGlobalLocation.x < _map.XResolution - 1 && tileGlobalLocation.y < _map.ZResolution - 1)
+                    {
+                        var toptileocation = new Vector2Int(tileGlobalLocation.x + 1, tileGlobalLocation.y + 1);
+                        var topTile = _map.Tiles[toptileocation];
+                        
+                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter + 2 });
+                    }
+
+                    //bottom right
+                    if (tileGlobalLocation.x < _map.XResolution - 1 && tileGlobalLocation.y > 0)
+                    {
+                        var toptileocation = new Vector2Int(tileGlobalLocation.x + 1, tileGlobalLocation.y - 1);
+                        var topTile = _map.Tiles[toptileocation];
+                        
+                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter + 3 });
+                    }
+
+                    //bottom left
+                    if (tileGlobalLocation.x > 0 && tileGlobalLocation.y > 0)
+                    {
+                        var toptileocation = new Vector2Int(tileGlobalLocation.x - 1, tileGlobalLocation.y - 1);
+                        var topTile = _map.Tiles[toptileocation];
+
+                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter });
+                    }
+
+                    //                    if (tileGlobalLocation.y > 0)
+                    //                    {
+                    //                        var topTileLocation = new Vector2Int(tileGlobalLocation.x , tileGlobalLocation.y - 1);
+                    //                        var topTile = _map.Tiles[topTileLocation];
+                    //
+                    //                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter + 1});
+                    //                        _mapChunksAccessor.OwnTileVertices[topTile].Add(new Vertex() { Chunk = this, Index = counter + 2});
+                    //                    }
+
+
                     counter += 5;
                 }
             }
-
-            _map.MapChunksAccessor.Recalculate();
 
             if (_vertexColors.Count == 0)
             {

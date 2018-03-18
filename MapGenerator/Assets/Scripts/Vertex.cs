@@ -4,7 +4,7 @@ namespace Assets.Scripts
 {
     public class Vertex
     {
-        public Vector3 Vector3
+        public Vector3 Location
         {
             get { return Chunk.Vertices[Index]; }
         }
