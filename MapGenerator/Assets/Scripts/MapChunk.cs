@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public class MapFrameBuilder : AbstractMeshGenerator, IMapChunk
+    public class MapChunk : AbstractMeshGenerator, IMapChunk
     {
         protected override string Name
         {
@@ -29,7 +29,7 @@ namespace Assets.Scripts
         private int _i;
         private int _j;
 
-        public MapFrameBuilder(
+        public MapChunk(
             Vector3 location,
             int xResolution,
             int zResolution,

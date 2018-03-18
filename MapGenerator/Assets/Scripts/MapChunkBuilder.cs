@@ -5,7 +5,7 @@ namespace Assets.Scripts
 {
     [RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshRenderer)), RequireComponent(typeof(MeshCollider))]
     [ExecuteInEditMode]
-    public class MapGenerator : MonoBehaviour
+    public class MapChunkBuilder : MonoBehaviour
     {
         [SerializeField] public Material Material;
         [SerializeField] public Vector3 Location;
@@ -13,11 +13,11 @@ namespace Assets.Scripts
         [SerializeField] [Range(1, 255)] public int ZResolution;
         [SerializeField] [Range(0, 1000)] public float Scale = 1f;
 
-        public MapFrameBuilder GenerateMap(int i, int j, Map map)
+        public MapChunk GenerateMap(int i, int j, Map map)
         {
             try
             {
-                var frame = new MapFrameBuilder(
+                var frame = new MapChunk(
                     Location,
                     XResolution,
                     ZResolution,

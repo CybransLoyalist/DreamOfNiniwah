@@ -5,7 +5,7 @@ namespace Assets.Scripts
     public class ProceduralInfiniteLandscapeGenerator : MonoBehaviour
     {
 
-        [SerializeField] private MapGenerator landscapePrefab;
+        [SerializeField] private MapChunkBuilder mapChunkPrefab;
         
         [SerializeField] private int xResolution = 20;
         [SerializeField] private int zResolution = 20;
@@ -22,7 +22,7 @@ namespace Assets.Scripts
             var chunksCountZ = (int)Mathf.Ceil((float) zResolution / MaxResolutionOfSingleChunk);
             int chunkSizeZ = zResolution / chunksCountZ;
 
-            var frames = new MapFrameBuilder[chunksCountX, chunksCountZ];
+            var frames = new MapChunk[chunksCountX, chunksCountZ];
 
 
             var map = new Map(
@@ -45,9 +45,9 @@ namespace Assets.Scripts
             map.CommitChanges();
         }
 
-        private MapFrameBuilder CreateTerrainChunk(int i, int j, Map map, Vector2 location, int chunkSizeX, int chunkSizeZ)
+        private MapChunk CreateTerrainChunk(int i, int j, Map map, Vector2 location, int chunkSizeX, int chunkSizeZ)
         {
-            MapGenerator chunk = Instantiate(landscapePrefab);
+            MapChunkBuilder chunk = Instantiate(mapChunkPrefab);
             chunk.Location = new Vector3(location.x, 0, location.y);
             chunk.XResolution = chunkSizeX;
             chunk.ZResolution = chunkSizeZ;
