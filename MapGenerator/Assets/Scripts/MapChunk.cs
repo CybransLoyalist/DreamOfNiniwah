@@ -51,8 +51,8 @@ namespace Assets.Scripts
             _meshFilter = meshFilter;
             _i = i;
             _j = j;
-            X = _i;
-            Z = _j;
+            XLocationAmongstChunks = _i;
+            ZLocationAmongstChunks = _j;
             _map = map;
         }
 
@@ -169,14 +169,17 @@ namespace Assets.Scripts
             BuildMesh();
         }
 
+        public List<Color32> VerticesColors {get { return _vertexColors; }}
+        public List<Vector3> Vertices { get { return _vertices; } }
+
         public void CommitChanges()
         {
             SetYPositionOfMiddleVertices();
             UpadteMesh();
         }
 
-        public int X { get; set; }
-        public int Z { get; set; }
+        public int XLocationAmongstChunks { get; set; }
+        public int ZLocationAmongstChunks { get; set; }
 
         public void SetYPositionOfMiddleVertices()
         {

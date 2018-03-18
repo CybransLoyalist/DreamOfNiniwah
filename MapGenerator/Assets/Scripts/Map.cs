@@ -7,11 +7,11 @@ namespace Assets.Scripts
 {
     public interface IMapChunk
     {
-        List<Color32> _vertexColors { get; set; }
-        List<Vector3> _vertices { get; set; }
+        List<Color32> VerticesColors { get; }
+        List<Vector3> Vertices { get;  }
         void CommitChanges();
-        int X { get; set; }
-        int Z { get; set; }
+        int XLocationAmongstChunks { get; set; }
+        int ZLocationAmongstChunks { get; set; }
     }
 
 
@@ -19,7 +19,7 @@ namespace Assets.Scripts
     {
         public Vector3 Vector3
         {
-            get { return Chunk._vertices[Index]; }
+            get { return Chunk.Vertices[Index]; }
         }
 
         public IMapChunk Chunk { get; set; }
@@ -80,7 +80,7 @@ namespace Assets.Scripts
             var tile = Tiles[new Vector2Int(x, y)];
             foreach (var tileVertex in tile.Vertices)
             {
-                tileVertex.Chunk._vertexColors[tileVertex.Index] = color;
+                tileVertex.Chunk.VerticesColors[tileVertex.Index] = color;
             }
         }
 
@@ -106,8 +106,8 @@ namespace Assets.Scripts
 
         private void RaiseVertex(Vertex vertex, float height)
         {
-            vertex.Chunk._vertices[vertex.Index] = new Vector3(vertex.Chunk._vertices[vertex.Index].x, height,
-                vertex.Chunk._vertices[vertex.Index].z);
+            vertex.Chunk.Vertices[vertex.Index] = new Vector3(vertex.Chunk.Vertices[vertex.Index].x, height,
+                vertex.Chunk.Vertices[vertex.Index].z);
         }
 
         public void LowerTile(int x, int y, float height)
@@ -132,8 +132,8 @@ namespace Assets.Scripts
 
         private void LowerVertex(Vertex vertex, float height)
         {
-            vertex.Chunk._vertices[vertex.Index] = new Vector3(vertex.Chunk._vertices[vertex.Index].x, height,
-                vertex.Chunk._vertices[vertex.Index].z);
+            vertex.Chunk.Vertices[vertex.Index] = new Vector3(vertex.Chunk.Vertices[vertex.Index].x, height,
+                vertex.Chunk.Vertices[vertex.Index].z);
         }
 
 
@@ -142,7 +142,7 @@ namespace Assets.Scripts
             var tile = Tiles[new Vector2Int(x, y)];
             foreach (var tileVertex in tile.Vertices)
             {
-                tileVertex.Chunk._vertexColors[tileVertex.Index] = color;
+                tileVertex.Chunk.VerticesColors[tileVertex.Index] = color;
             }
 
             var vectors = tile.Vertices.Select(a => a.Vector3);
@@ -153,7 +153,7 @@ namespace Assets.Scripts
                     .Where(a => vectors.Contains(a.Vector3));
                 foreach (var matchingVertex in matchingVertices)
                 {
-                    matchingVertex.Chunk._vertexColors[matchingVertex.Index] = color;
+                    matchingVertex.Chunk.VerticesColors[matchingVertex.Index] = color;
                 }
                 if (neighbour.x == x || neighbour.y == y)
                 {
@@ -196,7 +196,7 @@ namespace Assets.Scripts
             var tile = Tiles[new Vector2Int(x, y)];
 
             var middleVertes = tile.Vertices.First(a => a.IsMiddle);
-            middleVertes.Chunk._vertexColors[middleVertes.Index] = color;
+            middleVertes.Chunk.VerticesColors[middleVertes.Index] = color;
         }
 
         private List<Vector2Int> GetNeighbours(int x, int y)
