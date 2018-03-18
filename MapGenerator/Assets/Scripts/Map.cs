@@ -8,10 +8,51 @@ namespace Assets.Scripts
     public class MapChunksAccessor
     {
         public Dictionary<Tile, List<Vertex>> TileVertices;
+        public Dictionary<Tile, List<Vertex>> TileVertices2;
 
         public MapChunksAccessor()
         {
             TileVertices = new Dictionary<Tile, List<Vertex>>();
+            TileVertices2 = new Dictionary<Tile, List<Vertex>>();
+        }
+
+        public void Recalculate()
+        {
+            foreach (var tileVertex in TileVertices)
+            {
+                TileVertices2[tileVertex.Key] = tileVertex.Value.ToList();
+            }
+
+            foreach (var tileVertex1 in TileVertices2)
+            {
+                var tile = tileVertex1.Key;
+                var neighbours = TileVertices.Where(a =>
+                a.Key.X == tile.X - 1 && a.Key.Z == tile.Z ||
+                a.Key.X == tile.X + 1 && a.Key.Z == tile.Z ||
+                a.Key.X == tile.X  && a.Key.Z == tile.Z + 1 ||
+                a.Key.X == tile.X && a.Key.Z == tile.Z - 1 ||
+
+                a.Key.X == tile.X - 1 && a.Key.Z == tile.Z - 1 ||
+                a.Key.X == tile.X - 1 && a.Key.Z == tile.Z + 1 ||
+                a.Key.X == tile.X + 1 && a.Key.Z == tile.Z - 1 ||
+                a.Key.X == tile.X + 1 && a.Key.Z == tile.Z + 1 );
+
+                foreach (var keyValuePair in neighbours)
+                {
+                    foreach (var vertex in keyValuePair.Value)
+                    {
+                        if (tileVertex1.Value.Any(a => a.Vector3 == vertex.Vector3))
+                        {
+                            if (!tileVertex1.Value.Contains(vertex))
+                            {
+                                tileVertex1.Value.Add(vertex);
+                            }
+                        }
+                    }
+                }
+
+            }
+
         }
     }
     public class Map : IMap
@@ -73,21 +114,11 @@ namespace Assets.Scripts
         public void RaiseTile(int x, int y, float height)
         {
             var tile = Tiles[new Vector2Int(x, y)];
-            foreach (var tileVertex in MapChunksAccessor.TileVertices[tile])
+            foreach (var tileVertex in MapChunksAccessor.TileVertices2[tile])
             {
                 RaiseVertex(tileVertex, height);
             }
-            var vectors = MapChunksAccessor.TileVertices[tile].Select(a => a.Vector3);
-            var neighbours = GetNeighbours(x, y);
-            foreach (var neighbour in neighbours)
-            {
-                var matchingVertices = MapChunksAccessor.TileVertices[neighbour]
-                    .Where(a => vectors.Any(v => v.x == a.Vector3.x && v.z == a.Vector3.z)).ToList();
-                foreach (var matchingVertex in matchingVertices)
-                {
-                    RaiseVertex(matchingVertex, height);
-                }
-            }
+
         }
 
         private void RaiseVertex(Vertex vertex, float height)
@@ -99,20 +130,9 @@ namespace Assets.Scripts
         public void LowerTile(int x, int y, float height)
         {
             var tile = Tiles[new Vector2Int(x, y)];
-            foreach (var tileVertex in MapChunksAccessor.TileVertices[tile])
+            foreach (var tileVertex in MapChunksAccessor.TileVertices2[tile])
             {
                 LowerVertex(tileVertex, height);
-            }
-            var vectors = MapChunksAccessor.TileVertices[tile].Select(a => a.Vector3);
-            var neighbours = GetNeighbours(x, y);
-            foreach (var neighbour in neighbours)
-            {
-                var matchingVertices = MapChunksAccessor.TileVertices[neighbour]
-                    .Where(a => vectors.Any(v => v.x == a.Vector3.x && v.z == a.Vector3.z)).ToList();
-                foreach (var matchingVertex in matchingVertices)
-                {
-                    LowerVertex(matchingVertex, height);
-                }
             }
         }
 
@@ -126,25 +146,14 @@ namespace Assets.Scripts
         public void ColorTile(int x, int y, Color color)
         {
             var tile = Tiles[new Vector2Int(x, y)];
-            foreach (var tileVertex in MapChunksAccessor.TileVertices[tile])
+            foreach (var tileVertex in MapChunksAccessor.TileVertices2[tile])
             {
                 tileVertex.Chunk.VerticesColors[tileVertex.Index] = color;
             }
 
-            var vectors = MapChunksAccessor.TileVertices[tile].Select(a => a.Vector3);
-            var neighbours = GetNeighbours(x, y);
-            foreach (var neighbour in neighbours)
+            foreach (var neighbour in GetNeighbours(tile.X, tile.Z))
             {
-                var matchingVertices = MapChunksAccessor.TileVertices[neighbour]
-                    .Where(a => vectors.Contains(a.Vector3));
-                foreach (var matchingVertex in matchingVertices)
-                {
-                    matchingVertex.Chunk.VerticesColors[matchingVertex.Index] = color;
-                }
-//                if (neighbour.x == x || neighbour.y == y)
-//                {
-//                    ColorMiddleVertexOfTile(neighbour.x, neighbour.y, color);
-//                }
+                ColorMiddleVertexOfTile(neighbour.X, neighbour.Z, color);
             }
         }
 
@@ -181,7 +190,7 @@ namespace Assets.Scripts
         {
             var tile = Tiles[new Vector2Int(x, y)];
 
-            var middleVertes = MapChunksAccessor.TileVertices[tile].First(a => a.IsMiddle);
+            var middleVertes = MapChunksAccessor.TileVertices2[tile].First(a => a.IsMiddle);
             middleVertes.Chunk.VerticesColors[middleVertes.Index] = color;
         }
 
@@ -205,22 +214,22 @@ namespace Assets.Scripts
                 result.Add(Tiles[new Vector2Int(x, y + 1)]);
             }
 
-            if (x - 1 >= 0 && y - 1 >= 0)
-            {
-                result.Add(Tiles[new Vector2Int(x - 1, y - 1)]);
-            }
-            if (x + 1 < _xResolution && y + 1 < _zResolution)
-            {
-                result.Add(Tiles[new Vector2Int(x + 1, y + 1)]);
-            }
-            if (x + 1 < _xResolution && y - 1 >= 0)
-            {
-                result.Add(Tiles[new Vector2Int(x + 1, y - 1)]);
-            }
-            if (x - 1 >= 0 && y + 1 < _zResolution)
-            {
-                result.Add(Tiles[new Vector2Int(x - 1, y + 1)]);
-            }
+//            if (x - 1 >= 0 && y - 1 >= 0)
+//            {
+//                result.Add(Tiles[new Vector2Int(x - 1, y - 1)]);
+//            }
+//            if (x + 1 < _xResolution && y + 1 < _zResolution)
+//            {
+//                result.Add(Tiles[new Vector2Int(x + 1, y + 1)]);
+//            }
+//            if (x + 1 < _xResolution && y - 1 >= 0)
+//            {
+//                result.Add(Tiles[new Vector2Int(x + 1, y - 1)]);
+//            }
+//            if (x - 1 >= 0 && y + 1 < _zResolution)
+//            {
+//                result.Add(Tiles[new Vector2Int(x - 1, y + 1)]);
+//            }
             return result;
         }
 

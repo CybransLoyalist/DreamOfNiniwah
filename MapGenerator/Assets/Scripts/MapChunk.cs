@@ -121,6 +121,8 @@ namespace Assets.Scripts
                 }
             }
 
+            _map.MapChunksAccessor.Recalculate();
+
             if (_vertexColors.Count == 0)
             {
                 for (var i = 0; i < _numberOfVertices; i++)

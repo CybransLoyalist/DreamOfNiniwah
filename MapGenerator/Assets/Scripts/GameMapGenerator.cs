@@ -41,6 +41,10 @@ namespace Assets.Scripts
                 }
             }
             map.BuildMountain(10,10, 6,2);
+//            map.ColorTileExact(8,8, Color.magenta);
+//            map.ColorTile(10, 10, Color.green);
+//            map.RaiseTile(10, 10, 1f);
+//            map.LowerTile(5,5, -1f);
 //            map.BuildHollow(10,10, -2,2);
             map.CommitChanges();
         }
