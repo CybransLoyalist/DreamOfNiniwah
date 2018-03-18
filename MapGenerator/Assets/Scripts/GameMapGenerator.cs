@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public class ProceduralInfiniteLandscapeGenerator : MonoBehaviour
+    public class GameMapGenerator : MonoBehaviour
     {
 
         [SerializeField] private MapChunkBuilder mapChunkPrefab;
@@ -22,13 +22,13 @@ namespace Assets.Scripts
             var chunksCountZ = (int)Mathf.Ceil((float) zResolution / MaxResolutionOfSingleChunk);
             int chunkSizeZ = zResolution / chunksCountZ;
 
-            var frames = new MapChunk[chunksCountX, chunksCountZ];
+            var chunks = new MapChunk[chunksCountX, chunksCountZ];
 
 
             var map = new Map(
                 xResolution,
                 zResolution,
-                frames,
+                chunks,
                 chunksCountX,
                 chunksCountZ);
 
@@ -36,12 +36,12 @@ namespace Assets.Scripts
             {
                 for (int j = 0; j < chunksCountZ; j++)
                 {
-                   frames[i,j] =  CreateTerrainChunk(i,j,map, new Vector2(i * chunkSizeX * meshScale, j * chunkSizeZ * meshScale), chunkSizeX,chunkSizeZ);
+                   chunks[i,j] =  CreateTerrainChunk(i,j,map, new Vector2(i * chunkSizeX * meshScale, j * chunkSizeZ * meshScale), chunkSizeX,chunkSizeZ);
                    
                 }
             }
-            map.BuildMountain(4,4, 2,2);
-            map.BuildHollow(10,10, -2,2);
+            map.BuildMountain(10,10, 6,2);
+//            map.BuildHollow(10,10, -2,2);
             map.CommitChanges();
         }
 
