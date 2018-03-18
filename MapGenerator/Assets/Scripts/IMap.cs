@@ -9,7 +9,5 @@ namespace Assets.Scripts
 
         void BuildMountain(int x, int y, int peakHeigh, int ringWidth);
         void BuildHollow(int x, int y, int peakHeigh, int ringWidth);
-
-        void CommitChanges();
     }
 }

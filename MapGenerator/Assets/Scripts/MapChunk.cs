@@ -28,6 +28,7 @@ namespace Assets.Scripts
         private Map _map;
         private int _i;
         private int _j;
+        private MapChunksAccessor _MapChunksAccessor;
 
         public MapChunk(
             Vector3 location,
@@ -39,7 +40,8 @@ namespace Assets.Scripts
             MeshRenderer meshRenderer,
             MeshCollider meshCollider,
             int i, int j,
-            Map map)
+            Map map,
+            MapChunksAccessor MapChunksAccessor)
         {
             Location = location;
             XResolution = xResolution;
@@ -54,6 +56,7 @@ namespace Assets.Scripts
             XLocationAmongstChunks = _i;
             ZLocationAmongstChunks = _j;
             _map = map;
+            _MapChunksAccessor = MapChunksAccessor;
         }
 
 
@@ -103,14 +106,14 @@ namespace Assets.Scripts
                     VerticesLocations[x * 2 + 1, z * 2 + 1].Add(counter + 4);
 
                     var mapTile = _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)];
-                    _map.MapChunksAccessor.TileVertices[mapTile].Add(new Vertex() {Chunk = this, Index = counter});
+                    _map.MapChunksAccessor.OwnTileVertices[mapTile].Add(new Vertex() {Chunk = this, Index = counter});
 
 
 
-                    _map.MapChunksAccessor.TileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 1});
-                    _map.MapChunksAccessor.TileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 2});
-                    _map.MapChunksAccessor.TileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 3});
-                    _map.MapChunksAccessor.TileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {IsMiddle = true, Chunk = this, Index = counter + 4});
+                    _MapChunksAccessor.OwnTileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 1});
+                    _MapChunksAccessor.OwnTileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 2});
+                    _MapChunksAccessor.OwnTileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 3});
+                    _MapChunksAccessor.OwnTileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {IsMiddle = true, Chunk = this, Index = counter + 4});
 
                     _vertices.Add(vertex00);
                     _vertices.Add(vertex01);

@@ -13,7 +13,7 @@ namespace Assets.Scripts
         [SerializeField] [Range(1, 255)] public int ZResolution;
         [SerializeField] [Range(0, 1000)] public float Scale = 1f;
 
-        public MapChunk GenerateMap(int i, int j, Map map)
+        public MapChunk GenerateMap(int i, int j, Map map, MapChunksAccessor MapChunksAccessor)
         {
             try
             {
@@ -28,7 +28,8 @@ namespace Assets.Scripts
                     GetComponent<MeshCollider>(),
                     i,
                     j,
-                    map);
+                    map,
+                    MapChunksAccessor);
                 frame.Build();
                 return frame;
             }
