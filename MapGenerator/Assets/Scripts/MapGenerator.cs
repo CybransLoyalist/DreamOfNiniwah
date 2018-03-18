@@ -13,12 +13,7 @@ namespace Assets.Scripts
         [SerializeField] [Range(1, 255)] public int ZResolution;
         [SerializeField] [Range(0, 1000)] public float Scale = 1f;
 
-//        void Update()
-//        {
-//            GenerateMap();
-//        }
-
-        public MapFrameBuilder GenerateMap(int i, int j, Map3 map)
+        public MapFrameBuilder GenerateMap(int i, int j, Map map)
         {
             try
             {
@@ -31,13 +26,11 @@ namespace Assets.Scripts
                     GetComponent<MeshFilter>(),
                     GetComponent<MeshRenderer>(),
                     GetComponent<MeshCollider>(),
-                    i,j,
+                    i,
+                    j,
                     map);
                 frame.Build();
                 return frame;
-                // map.BuildMountain(20, 30, 5, 2);
-
-                //  map.CommitChanges();
             }
             catch (Exception e)
             {

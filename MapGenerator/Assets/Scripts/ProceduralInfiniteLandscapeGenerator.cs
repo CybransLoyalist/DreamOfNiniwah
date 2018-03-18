@@ -6,24 +6,13 @@ namespace Assets.Scripts
     {
 
         [SerializeField] private MapGenerator landscapePrefab;
-
-        [SerializeField] private Material material;
+        
         [SerializeField] private int xResolution = 20;
         [SerializeField] private int zResolution = 20;
 
         [SerializeField] private float meshScale = 1;
-        [SerializeField] private float yScale = 1;
-
-        [SerializeField, Range(1, 8)] private int octaves = 1;
-        [SerializeField] private float lacunarity = 2;
-
-        [SerializeField, Range(0, 1)]
-        private float gain = 0.5f
-            ; //needs to be between 0 and 1 so that each octave contributes less to the final shape.
-
-        [SerializeField] private float perlinScale = 1;
-        [SerializeField] private float uvScale = 1;
-        private const int MaxResolutionOfSingleChunk = 4;
+        
+        private const int MaxResolutionOfSingleChunk = 10;
 
         void Awake()
         {
@@ -36,7 +25,7 @@ namespace Assets.Scripts
             var frames = new MapFrameBuilder[chunksCountX, chunksCountZ];
 
 
-            var map = new Map3(
+            var map = new Map(
                 xResolution,
                 zResolution,
                 frames,
@@ -51,18 +40,12 @@ namespace Assets.Scripts
                    
                 }
             }
-            
-
-
-//            map.ColorTileExact(3,3, Color.cyan);
-//            map.RaiseTile(3,3, 1f);
-
-            map.ColorTileExact(2,2, Color.magenta);
-            map.BuildMountain(5,5, 2,2);
+            map.BuildMountain(4,4, 2,2);
+            map.BuildHollow(10,10, -2,2);
             map.CommitChanges();
         }
 
-        private MapFrameBuilder CreateTerrainChunk(int i, int j, Map3 map, Vector2 location, int chunkSizeX, int chunkSizeZ)
+        private MapFrameBuilder CreateTerrainChunk(int i, int j, Map map, Vector2 location, int chunkSizeX, int chunkSizeZ)
         {
             MapGenerator chunk = Instantiate(landscapePrefab);
             chunk.Location = new Vector3(location.x, 0, location.y);

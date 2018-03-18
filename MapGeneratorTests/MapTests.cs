@@ -4,9 +4,9 @@ using NUnit.Framework;
 namespace MapGeneratorTests
 {
     [TestFixture]
-    public class Map3Tests
+    public class MapTests
     {
-        private Map3 _sut;
+        private Map _sut;
         private IMapChunk[,] _chunks;
         private IMapChunk _chunk00;
         private IMapChunk _chunk01;
@@ -30,7 +30,7 @@ namespace MapGeneratorTests
             _chunks[1, 1] = _chunk11;
             _chunks[1, 0] = _chunk10;
 
-            _sut = new Map3(
+            _sut = new Map(
                 xMapResolution,
                 xMapResolution,
                 _chunks,

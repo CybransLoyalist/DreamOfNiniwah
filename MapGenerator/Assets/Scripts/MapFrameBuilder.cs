@@ -25,7 +25,7 @@ namespace Assets.Scripts
         private const int TrianglesPerTile = 4;
         private const int TriangleCornersInTriangle = 3;
         private readonly Color _baseColor = Color.yellow;
-        private Map3 _map;
+        private Map _map;
         private int _i;
         private int _j;
 
@@ -39,7 +39,7 @@ namespace Assets.Scripts
             MeshRenderer meshRenderer,
             MeshCollider meshCollider,
             int i, int j,
-            Map3 map)
+            Map map)
         {
             Location = location;
             XResolution = xResolution;
@@ -94,32 +94,25 @@ namespace Assets.Scripts
                     var vertex10 = new Vector3(Location.x + (x + 1) * Scale, Location.y, Location.z + z * Scale);
                     var vertexMiddle = new Vector3(Location.x + (x + 0.5f) * Scale, Location.y,
                         Location.z + (z + 0.5f) * Scale);
-                    
+
                     VerticesLocations[x * 2, z * 2].Add(counter);
-                    
+
                     VerticesLocations[x * 2, z * 2 + 2].Add(counter + 1);
                     VerticesLocations[x * 2 + 2, z * 2 + 2].Add(counter + 2);
                     VerticesLocations[x * 2 + 2, z * 2].Add(counter + 3);
                     VerticesLocations[x * 2 + 1, z * 2 + 1].Add(counter + 4);
-                   
-                    
 
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices.Add(new Vertex() {Chunk = this, Index = counter});
 
-//                    if (_i * XResolution + x > 0 && _j * ZResolution + z > 0 && _i > 0 && _j > 0)
-//                    {
-//                        _map.Tiles[new Vector2Int(_i * XResolution + x - 1, _j * ZResolution + z)].Vertices
-//                            .Add(new Vertex() {Chunk = _map._chunks[_i - 1, _j], Index = counter});
-//                        _map.Tiles[new Vector2Int(_i * XResolution + x - 1, _j * ZResolution + z - 1)].Vertices
-//                            .Add(new Vertex() {Chunk = _map._chunks[_i - 1, _j - 1], Index = counter});
-//                        _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z - 1)].Vertices
-//                            .Add(new Vertex() {Chunk = _map._chunks[_i , _j -1], Index = counter});
-//                    }
-
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices.Add(new Vertex() {Chunk = this, Index = counter + 1});
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices.Add(new Vertex() {Chunk = this, Index = counter + 2});
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices.Add(new Vertex() {Chunk = this, Index = counter + 3});
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices.Add(new Vertex() {IsMiddle = true, Chunk = this, Index = counter + 4});
+                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
+                        .Add(new Vertex() {Chunk = this, Index = counter});
+                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
+                        .Add(new Vertex() {Chunk = this, Index = counter + 1});
+                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
+                        .Add(new Vertex() {Chunk = this, Index = counter + 2});
+                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
+                        .Add(new Vertex() {Chunk = this, Index = counter + 3});
+                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
+                        .Add(new Vertex() {IsMiddle = true, Chunk = this, Index = counter + 4});
 
                     _vertices.Add(vertex00);
                     _vertices.Add(vertex01);
@@ -171,22 +164,6 @@ namespace Assets.Scripts
         {
         }
 
-//        public IMap Build()
-//        {
-//            BuildMesh();
-//            var callback = new Action(() => UpadteMesh());
-//
-//            return new Map(
-//                XResolution,
-//                ZResolution,
-//                Scale,
-//                VerticesLocations,
-//                _vertices,
-//                _vertexColors,
-//                _numberOfVertices,
-//                callback);
-//        }
-
         public void Build()
         {
             BuildMesh();
@@ -194,7 +171,6 @@ namespace Assets.Scripts
 
         public void CommitChanges()
         {
-
             SetYPositionOfMiddleVertices();
             UpadteMesh();
         }
@@ -203,20 +179,20 @@ namespace Assets.Scripts
         public int Z { get; set; }
 
         public void SetYPositionOfMiddleVertices()
+        {
+            for (var i = 0; i < _numberOfVertices; i += 5)
+            {
+                var middleVertice = i + 4;
+
+                var totalHeight = 0f;
+                for (var j = i; j < i + 4; j++)
                 {
-                    for (var i = 0; i < _numberOfVertices; i += 5)
-                    {
-                        var middleVertice = i + 4;
-        
-                        var totalHeight = 0f;
-                        for (var j = i; j < i + 4; j++)
-                        {
-                            totalHeight += _vertices[j].y;
-                        }
-        
-                        _vertices[middleVertice] = new Vector3(_vertices[middleVertice].x, totalHeight / 4f,
-                            _vertices[middleVertice].z);
-                    }
+                    totalHeight += _vertices[j].y;
                 }
+
+                _vertices[middleVertice] = new Vector3(_vertices[middleVertice].x, totalHeight / 4f,
+                    _vertices[middleVertice].z);
+            }
+        }
     }
 }
