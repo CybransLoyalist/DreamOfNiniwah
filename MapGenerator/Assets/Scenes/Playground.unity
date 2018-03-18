@@ -143,8 +143,8 @@ MonoBehaviour:
   landscapePrefab: {fileID: 114689932521561256, guid: 3d6192e86e5427d45b09aa14f998f168,
     type: 2}
   material: {fileID: 2100000, guid: d49f8987f3171a441b3d13a3760276ba, type: 2}
-  xResolution: 80
-  zResolution: 80
+  xResolution: 4
+  zResolution: 4
   meshScale: 1
   yScale: 1
   octaves: 1

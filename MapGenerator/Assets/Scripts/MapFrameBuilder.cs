@@ -19,7 +19,7 @@ namespace Assets.Scripts
         private int TilesCount;
         private int VerticesXCount;
         private int VerticesZCount;
-        private List<int>[,] VerticesLocations;
+        public List<int>[,] VerticesLocations;
 
         private const int VerticesPerTile = 5;
         private const int TrianglesPerTile = 4;
@@ -143,20 +143,49 @@ namespace Assets.Scripts
         {
         }
 
-        public IMap Build()
+//        public IMap Build()
+//        {
+//            BuildMesh();
+//            var callback = new Action(() => UpadteMesh());
+//
+//            return new Map(
+//                XResolution,
+//                ZResolution,
+//                Scale,
+//                VerticesLocations,
+//                _vertices,
+//                _vertexColors,
+//                _numberOfVertices,
+//                callback);
+//        }
+
+        public void Build()
         {
             BuildMesh();
-            var callback = new Action(() => UpadteMesh());
-
-            return new Map(
-                XResolution,
-                ZResolution,
-                Scale,
-                VerticesLocations,
-                _vertices,
-                _vertexColors,
-                _numberOfVertices,
-                callback);
         }
+
+        public void CommitChanges()
+        {
+
+            SetYPositionOfMiddleVertices();
+            UpadteMesh();
+        }
+
+                public void SetYPositionOfMiddleVertices()
+                {
+                    for (var i = 0; i < _numberOfVertices; i += 5)
+                    {
+                        var middleVertice = i + 4;
+        
+                        var totalHeight = 0f;
+                        for (var j = i; j < i + 4; j++)
+                        {
+                            totalHeight += _vertices[j].y;
+                        }
+        
+                        _vertices[middleVertice] = new Vector3(_vertices[middleVertice].x, totalHeight / 4f,
+                            _vertices[middleVertice].z);
+                    }
+                }
     }
 }

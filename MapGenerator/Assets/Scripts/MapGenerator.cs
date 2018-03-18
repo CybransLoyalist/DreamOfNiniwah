@@ -18,11 +18,11 @@ namespace Assets.Scripts
 //            GenerateMap();
 //        }
 
-        public void GenerateMap()
+        public MapFrameBuilder GenerateMap()
         {
             try
             {
-                var map = new MapFrameBuilder(
+                var frame = new MapFrameBuilder(
                     Location,
                     XResolution,
                     ZResolution,
@@ -30,15 +30,17 @@ namespace Assets.Scripts
                     Material,
                     GetComponent<MeshFilter>(),
                     GetComponent<MeshRenderer>(),
-                    GetComponent<MeshCollider>()).Build();
+                    GetComponent<MeshCollider>());
+                frame.Build();
+                return frame;
+                // map.BuildMountain(20, 30, 5, 2);
 
-                map.BuildMountain(20, 30, 5, 2);
-
-                map.CommitChanges();
+                //  map.CommitChanges();
             }
             catch (Exception e)
             {
                 print("Map generator error: " + e.Message);
+                throw e;
             }
         }
     }
