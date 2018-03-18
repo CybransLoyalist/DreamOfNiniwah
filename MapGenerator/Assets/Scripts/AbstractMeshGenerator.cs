@@ -9,7 +9,7 @@ namespace Assets.Scripts
         protected Material Material;
         protected abstract string Name { get; }
 
-       public List<Vector3> _vertices;
+       public List<Vector3> _vertices { get; set; }
        public List<int> _triangles;
 
         protected int _numberOfVertices;
@@ -23,7 +23,7 @@ namespace Assets.Scripts
         protected List<Vector3> _normals;
         protected List<Vector4> _tangents;
         protected List<Vector2> _uvs;
-        public List<Color32> _vertexColors;
+        public List<Color32> _vertexColors { get; set; }
 
         protected MeshFilter _meshFilter;
         protected MeshRenderer _meshRenderer;

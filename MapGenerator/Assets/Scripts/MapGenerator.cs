@@ -18,7 +18,7 @@ namespace Assets.Scripts
 //            GenerateMap();
 //        }
 
-        public MapFrameBuilder GenerateMap()
+        public MapFrameBuilder GenerateMap(int i, int j, Map3 map)
         {
             try
             {
@@ -30,7 +30,9 @@ namespace Assets.Scripts
                     Material,
                     GetComponent<MeshFilter>(),
                     GetComponent<MeshRenderer>(),
-                    GetComponent<MeshCollider>());
+                    GetComponent<MeshCollider>(),
+                    i,j,
+                    map);
                 frame.Build();
                 return frame;
                 // map.BuildMountain(20, 30, 5, 2);
