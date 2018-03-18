@@ -4,6 +4,8 @@ namespace Assets.Scripts
 {
     public class Tile
     {
-        public List<Vertex> Vertices { get; set; }
+        public int X { get; set; }
+        public int Z { get; set; }
+//        public List<Vertex> Vertices { get; set; }
     }
 }

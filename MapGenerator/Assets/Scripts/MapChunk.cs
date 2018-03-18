@@ -102,17 +102,15 @@ namespace Assets.Scripts
                     VerticesLocations[x * 2 + 2, z * 2].Add(counter + 3);
                     VerticesLocations[x * 2 + 1, z * 2 + 1].Add(counter + 4);
 
+                    var mapTile = _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)];
+                    _map.MapChunksAccessor.TileVertices[mapTile].Add(new Vertex() {Chunk = this, Index = counter});
 
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
-                        .Add(new Vertex() {Chunk = this, Index = counter});
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
-                        .Add(new Vertex() {Chunk = this, Index = counter + 1});
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
-                        .Add(new Vertex() {Chunk = this, Index = counter + 2});
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
-                        .Add(new Vertex() {Chunk = this, Index = counter + 3});
-                    _map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)].Vertices
-                        .Add(new Vertex() {IsMiddle = true, Chunk = this, Index = counter + 4});
+
+
+                    _map.MapChunksAccessor.TileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 1});
+                    _map.MapChunksAccessor.TileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 2});
+                    _map.MapChunksAccessor.TileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {Chunk = this, Index = counter + 3});
+                    _map.MapChunksAccessor.TileVertices[_map.Tiles[new Vector2Int(_i * XResolution + x, _j * ZResolution + z)]].Add(new Vertex() {IsMiddle = true, Chunk = this, Index = counter + 4});
 
                     _vertices.Add(vertex00);
                     _vertices.Add(vertex01);
