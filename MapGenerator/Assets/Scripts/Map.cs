@@ -5,33 +5,6 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public interface IMapChunk
-    {
-        List<Color32> VerticesColors { get; }
-        List<Vector3> Vertices { get;  }
-        void CommitChanges();
-        int XLocationAmongstChunks { get; set; }
-        int ZLocationAmongstChunks { get; set; }
-    }
-
-
-    public class Vertex
-    {
-        public Vector3 Vector3
-        {
-            get { return Chunk.Vertices[Index]; }
-        }
-
-        public IMapChunk Chunk { get; set; }
-        public int Index { get; set; }
-        public bool IsMiddle { get; set; }
-    }
-
-    public class Tile
-    {
-        public List<Vertex> Vertices { get; set; }
-    }
-
     public class Map : IMap
     {
         public IMapChunk[,] _chunks;
