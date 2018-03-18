@@ -56,7 +56,6 @@ namespace Assets.Scripts
 
 //            map.ColorTileExact(3,3, Color.cyan);
 //            map.RaiseTile(3,3, 1f);
-//            map.LowerTile(0,0, -1f);
 
             map.ColorTileExact(2,2, Color.magenta);
             map.BuildMountain(5,5, 2,2);
