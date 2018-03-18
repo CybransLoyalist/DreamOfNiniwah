@@ -142,8 +142,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapChunkPrefab: {fileID: 114689932521561256, guid: 3d6192e86e5427d45b09aa14f998f168,
     type: 2}
-  xResolution: 500
-  zResolution: 500
+  xResolution: 100
+  zResolution: 100
   meshScale: 1
 --- !u!4 &951204378
 Transform:

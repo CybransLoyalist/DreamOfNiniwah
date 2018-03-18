@@ -7,7 +7,7 @@ namespace Assets.Scripts
     {
         public void GenerateFor(IMap map)
         {
-            map.BuildMountain(10, 10, 6, 2);
+            map.BuildMountain(20,20, 6, 2);
 //            map.ColorTileExact(1,1, Color.magenta);
             map.ColorTile(1,1, Color.green);
             map.RaiseTile(1,1, 1f);
