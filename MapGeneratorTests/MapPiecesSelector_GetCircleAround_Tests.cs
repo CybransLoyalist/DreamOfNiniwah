@@ -11,10 +11,13 @@ namespace MapGeneratorTests
     [TestFixture]
     public class MapPiecesSelector_GetCircleAround_Tests : MapGeneratorBaseTest
     {
+        private const int MaxX = 20;
+        private const int MaxZ = 20;
+
         [Test]
         public void GetZeroCircleAround_ShallGetCenterTile()
         {
-            var result = MapPiecesSelector.GetCircleAround(4, 4, 0);
+            var result = MapPiecesSelector.GetCircleAround(4, 4, 0, MaxX, MaxZ);
 
             Assert.AreEqual(1, result.Count);
             
@@ -24,7 +27,7 @@ namespace MapGeneratorTests
         [Test]
         public void GetFirstCircleAround_ShallGetProperTiles()
         {
-            var result = MapPiecesSelector.GetCircleAround(4, 4, 1);
+            var result = MapPiecesSelector.GetCircleAround(4, 4, 1, MaxX, MaxZ);
 
             Assert.AreEqual(9, result.Count);
 
@@ -44,7 +47,7 @@ namespace MapGeneratorTests
         [Test]
         public void GetSecondCircleAround_ShallGetProperTiles()
         {
-            var result = MapPiecesSelector.GetCircleAround(4, 4, 2);
+            var result = MapPiecesSelector.GetCircleAround(4, 4, 2, MaxX, MaxZ);
 
             Assert.AreEqual(25, result.Count);
 
@@ -82,7 +85,7 @@ namespace MapGeneratorTests
         [Test]
         public void GetThirdCircleAround_ShallGetProperTiles()
         {
-            var result = MapPiecesSelector.GetCircleAround(4, 4, 3);
+            var result = MapPiecesSelector.GetCircleAround(4, 4, 3, MaxX, MaxZ);
 
             Assert.AreEqual(45, result.Count);
             

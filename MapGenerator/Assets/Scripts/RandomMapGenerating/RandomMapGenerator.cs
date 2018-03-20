@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Assets.Scripts.MapChanging;
 
 namespace Assets.Scripts.RandomMapGenerating
@@ -18,6 +19,11 @@ namespace Assets.Scripts.RandomMapGenerating
 
         public void GenerateFor(IMapChanger mapChanger)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            mapChanger.BuildMountain(0, 50, 5, 20, 0.5f);
+            stopwatch.Stop();
+            var time = stopwatch.ElapsedMilliseconds;
         }
     }
 }

@@ -9,6 +9,9 @@ namespace MapGeneratorTests
     [TestFixture]
     public class MapPiecesSelector_GetRingAround_Tests : MapGeneratorBaseTest
     {
+        public const int maxX = 20;
+        public const int maxZ = 20;
+
         [Test]
         public void GetXRangeForFirstRing_OfWidth1_ShallGetProperRange_1()
         {
@@ -62,13 +65,13 @@ namespace MapGeneratorTests
         [TestCase(2)]
         public void GetZeroRingAround_ShallThrowException(int ringWidth)
         {
-            Assert.Throws<ArgumentException>(() => MapPiecesSelector.GetRingAround(4, 4, 0, ringWidth));
+            Assert.Throws<ArgumentException>(() => MapPiecesSelector.GetRingAround(4, 4, 0, ringWidth, maxX, maxZ));
         }
 
         [Test]
         public void GetFirstRingAround_OfWidth1_ShallGetProperRing()
         {
-            var result = MapPiecesSelector.GetRingAround(4, 4, 1, 1);
+            var result = MapPiecesSelector.GetRingAround(4, 4, 1, 1, maxX, maxZ);
             Assert.AreEqual(8, result.Count);
 
             AssertContainsVector(result, new Vector2Int(3,3));
@@ -86,7 +89,7 @@ namespace MapGeneratorTests
         [Test]
         public void GetFirstRingAround_OfWidth2_ShallGetProperRing()
         {
-            var result = MapPiecesSelector.GetRingAround(4, 4, 1, 2);
+            var result = MapPiecesSelector.GetRingAround(4, 4, 1, 2, maxX, maxZ);
             Assert.AreEqual(24, result.Count);
 
             AssertContainsVector(result, new Vector2Int(2, 2));
@@ -122,7 +125,7 @@ namespace MapGeneratorTests
         [Test]
         public void GetSecondRingAround_OfWidth1_ShallGetProperRing()
         {
-            var result = MapPiecesSelector.GetRingAround(4, 4, 2, 1);
+            var result = MapPiecesSelector.GetRingAround(4, 4, 2, 1, maxX, maxZ);
             Assert.AreEqual(16, result.Count);
 
             AssertContainsVector(result, new Vector2Int(2, 2));

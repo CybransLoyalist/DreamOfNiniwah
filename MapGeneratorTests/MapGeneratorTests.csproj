@@ -46,7 +46,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MapTests.cs" />
     <Compile Include="MapGeneratorBaseTest.cs" />
     <Compile Include="MapPiecesSelector_GetCircleAround_Tests.cs" />
     <Compile Include="MapPiecesSelector_GetRingAround_Tests.cs" />

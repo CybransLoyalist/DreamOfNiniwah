@@ -10,7 +10,7 @@ namespace Assets.Scripts.MapChanging
             var result = new Dictionary<Vector2Int, float>();
             
             var circleAroundPeakRadius = ringWidth == 0 ? 0 : (int)Mathf.Ceil(ringWidth /2f);
-            var circleAroundPeak = MapPiecesSelector.GetCircleAround(x, y, circleAroundPeakRadius);
+            var circleAroundPeak = MapPiecesSelector.GetCircleAround(x, y, circleAroundPeakRadius, maxX, maxZ);
             foreach (var tile in circleAroundPeak)
             {
                 result.Add(tile, levelsCount * ringHeight);
@@ -22,7 +22,7 @@ namespace Assets.Scripts.MapChanging
 
             while (level > 0)
             {
-                var ringToBeRaised = MapPiecesSelector.GetRingAround(x, y, ringBeginning, ringWidth);
+                var ringToBeRaised = MapPiecesSelector.GetRingAround(x, y, ringBeginning, ringWidth, maxX, maxZ);
                 foreach (var tile in ringToBeRaised)
                 {
                     if(MapOperationValidator.IsValidPointOnMap(tile.x, tile.y, maxX, maxZ))
@@ -41,7 +41,7 @@ namespace Assets.Scripts.MapChanging
             var result = new Dictionary<Vector2Int, float>();
             
             var circleAroundPeakRadius = ringWidth == 0 ? 0 : (int)Mathf.Ceil(ringWidth /2f);
-            var circleAroundPeak = MapPiecesSelector.GetCircleAround(x, y, circleAroundPeakRadius);
+            var circleAroundPeak = MapPiecesSelector.GetCircleAround(x, y, circleAroundPeakRadius, maxX, maxZ);
             foreach (var tile in circleAroundPeak)
             {
                 result.Add(tile, levelsCount * ringHeight);
@@ -53,7 +53,7 @@ namespace Assets.Scripts.MapChanging
 
             while (level < 0)
             {
-                var ringToBeRaised = MapPiecesSelector.GetRingAround(x, y, ringBeginning, ringWidth);
+                var ringToBeRaised = MapPiecesSelector.GetRingAround(x, y, ringBeginning, ringWidth, maxX, maxZ);
                 foreach (var tile in ringToBeRaised)
                 {
                     if(MapOperationValidator.IsValidPointOnMap(tile.x, tile.y, maxX, maxZ))

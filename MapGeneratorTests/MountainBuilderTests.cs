@@ -8,10 +8,14 @@ namespace MapGeneratorTests
     [TestFixture]
     public class MountainBuilderTests
     {
+        private const float ringHeight = 1f;
+        private const int MaxX = 20;
+        private const int MaxZ = 20;
+
         [Test]
         public void BuildingOneTileMountain_ShallRaiseOnlyPeak()
         {
-            var result = MountainBuilder.BuildMountain(4, 4, 1, 0);
+            var result = MountainBuilder.BuildMountain(4, 4, 1, 0, ringHeight, MaxX, MaxZ);
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(1f, result[new Vector2Int(4,4)]);
@@ -20,7 +24,7 @@ namespace MapGeneratorTests
         [Test]
         public void BuildingOneTileMountain_WithRingWidth1_ShallRaisePeakAndClosestNeighbours()
         {
-            var result = MountainBuilder.BuildMountain(4, 4, 1, 1);
+            var result = MountainBuilder.BuildMountain(4, 4, 1, 1, ringHeight, MaxX, MaxZ);
 
             Assert.AreEqual(9, result.Count);
 
@@ -36,7 +40,7 @@ namespace MapGeneratorTests
         [Test]
         public void BuildingOneTileMountain_WithRingWidth2__ShallRaisePeakAndClosestNeighbours()
         {
-            var result = MountainBuilder.BuildMountain(4, 4, 1, 2);
+            var result = MountainBuilder.BuildMountain(4, 4, 1, 2, ringHeight, MaxX, MaxZ);
 
             Assert.AreEqual(9, result.Count);
 
@@ -53,7 +57,7 @@ namespace MapGeneratorTests
         [Test]
         public void BuildingMountainWithPeakAt2_AndRingsOfWidth2_ShallGetProperTiles()
         {
-            var result = MountainBuilder.BuildMountain(4, 4, 2, 2);
+            var result = MountainBuilder.BuildMountain(4, 4, 2, 2, ringHeight, MaxX, MaxZ);
 
             Assert.AreEqual(45, result.Count);
 
