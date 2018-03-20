@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts;
+using Assets.Scripts.MapChanging;
 using NUnit.Framework;
 using UnityEngine;
 

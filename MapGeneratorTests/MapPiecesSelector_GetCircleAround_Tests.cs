@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Assets.Scripts;
+using Assets.Scripts.MapChanging;
 using NUnit.Framework;
 using UnityEngine;
 

@@ -1,4 +1,6 @@
 using Assets.Scripts;
+using Assets.Scripts.MapChanging;
+using Assets.Scripts.MapMeshGenerating;
 using NUnit.Framework;
 
 namespace MapGeneratorTests
@@ -6,7 +8,7 @@ namespace MapGeneratorTests
     [TestFixture]
     public class MapTests
     {
-        private Map _sut;
+        private MapChanger _sut;
         private IMapChunk[,] _chunks;
         private IMapChunk _chunk00;
         private IMapChunk _chunk01;
@@ -30,7 +32,7 @@ namespace MapGeneratorTests
             _chunks[1, 1] = _chunk11;
             _chunks[1, 0] = _chunk10;
 
-            _sut = new Map(
+            _sut = new MapChanger(
                 xMapResolution,
                 xMapResolution,
                 _chunks,
