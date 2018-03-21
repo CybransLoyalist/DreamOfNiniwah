@@ -16,5 +16,7 @@ namespace Assets.Scripts.MapChanging
         int ZResolution { get; }
         int XResolution { get; }
         void RaiseTile(int x, int y, float height);
+
+        void ColorRingsAround(int x, int y, int ringsCount, int ringWidth);
     }
 }

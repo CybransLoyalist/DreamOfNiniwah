@@ -39,10 +39,7 @@ namespace Assets.Scripts.MapChanging
             if (IsValidPointOnMap(x, y))
             {
                 var tile = Tiles[new Vector2Int(x, y)];
-                foreach (var tileVertex in _mapChunksAccessor.OwnTileVertices[tile])
-                {
-                    tileVertex.SetColor(color);
-                }
+                ColorMiddleVertexOfTile(tile, color);
             }
         }
 
@@ -89,11 +86,6 @@ namespace Assets.Scripts.MapChanging
 
         public void BuildMountain(int x, int y, int levelsCount, int ringWidth, float ringHeight)
         {
-            if (levelsCount <= 0)
-            {
-                Debug.LogWarning("Building mountain with 0 or lower peak height");
-                return;
-            }
             var tileHeights = MountainBuilder.BuildMountain(x, y, levelsCount, ringWidth, ringHeight, XResolution, ZResolution);
             foreach (var tileHeight in tileHeights)
             {
@@ -103,11 +95,6 @@ namespace Assets.Scripts.MapChanging
 
         public void BuildHollow(int x, int y, int levelsCount, int ringWidth, float ringHeight)
         {
-            if (levelsCount >= 0)
-            {
-                Debug.LogWarning("Building hollow with 0 or higher depth");
-                return;
-            }
             var tileHeights = MountainBuilder.BuildHollow(x, y, levelsCount, ringWidth, ringHeight, XResolution, ZResolution);
             foreach (var tileHeight in tileHeights)
             {
@@ -168,6 +155,21 @@ namespace Assets.Scripts.MapChanging
                 _neighboursRelations[tile] = result;
             }
             return _neighboursRelations[tile]; ;
+        }
+
+        private static List<Color> _colors = new List<Color>{Color.blue, Color.black, Color.cyan, Color.gray, Color.magenta, Color.green, Color.red};
+        public void ColorRingsAround(int x, int y, int ringsCount, int ringWidth)
+        {
+            var rings = MapPiecesSelector.GetRingsAround(x, y, ringsCount, ringWidth, XResolution, ZResolution);
+
+            foreach (var ring in rings)
+            {
+                foreach (var tile in ring.Value)
+                {
+
+                    ColorTileExact(tile.x, tile.y, _colors[ring.Key]);
+                }
+            }
         }
 
         private bool IsValidPointOnMap(int x, int y)

@@ -8,30 +8,25 @@ namespace Assets.Scripts.MapChanging
         public static Dictionary<Vector2Int, float> BuildMountain(int x, int y, int levelsCount, int ringWidth, float ringHeight, int maxX, int maxZ)
         {
             var result = new Dictionary<Vector2Int, float>();
-            
-            var circleAroundPeakRadius = ringWidth == 0 ? 0 : (int)Mathf.Ceil(ringWidth /2f);
-            var circleAroundPeak = MapPiecesSelector.GetCircleAround(x, y, circleAroundPeakRadius, maxX, maxZ);
-            foreach (var tile in circleAroundPeak)
+
+            var ringsToBeRaised = MapPiecesSelector.GetRingsAround(x, y, levelsCount, ringWidth, maxX, maxZ);
+            for(int i = 0; i < levelsCount; ++i)
             {
-                result.Add(tile, levelsCount * ringHeight);
-            }
 
-
-            int level = levelsCount - 1;
-            var ringBeginning = circleAroundPeakRadius + 1;
-
-            while (level > 0)
-            {
-                var ringToBeRaised = MapPiecesSelector.GetRingAround(x, y, ringBeginning, ringWidth, maxX, maxZ);
-                foreach (var tile in ringToBeRaised)
+                foreach (var tile in ringsToBeRaised[i])
                 {
-                    if(MapOperationValidator.IsValidPointOnMap(tile.x, tile.y, maxX, maxZ))
+                    if (MapOperationValidator.IsValidPointOnMap(tile.x, tile.y, maxX, maxZ))
                     {
-                        result.Add(tile, level * ringHeight);
+                        if (!result.ContainsKey(tile))
+                        {
+                            result.Add(tile, (levelsCount  - i)* ringHeight);
+                        }
+                        else
+                        {
+                            result[tile] = (levelsCount - i) * ringHeight;
+                        }
                     }
                 }
-                ringBeginning += ringWidth;
-                level--;
             }
             return result;
         }
@@ -39,30 +34,25 @@ namespace Assets.Scripts.MapChanging
         public static Dictionary<Vector2Int, float> BuildHollow(int x, int y, int levelsCount, int ringWidth, float ringHeight, int maxX, int maxZ)
         {
             var result = new Dictionary<Vector2Int, float>();
-            
-            var circleAroundPeakRadius = ringWidth == 0 ? 0 : (int)Mathf.Ceil(ringWidth /2f);
-            var circleAroundPeak = MapPiecesSelector.GetCircleAround(x, y, circleAroundPeakRadius, maxX, maxZ);
-            foreach (var tile in circleAroundPeak)
+
+            var ringsToBeLowered = MapPiecesSelector.GetRingsAround(x, y, levelsCount, ringWidth, maxX, maxZ);
+            for (int i = 0; i < levelsCount; ++i)
             {
-                result.Add(tile, levelsCount * ringHeight);
-            }
 
-
-            int level = levelsCount + 1;
-            var ringBeginning = circleAroundPeakRadius + 1;
-
-            while (level < 0)
-            {
-                var ringToBeRaised = MapPiecesSelector.GetRingAround(x, y, ringBeginning, ringWidth, maxX, maxZ);
-                foreach (var tile in ringToBeRaised)
+                foreach (var tile in ringsToBeLowered[i])
                 {
-                    if(MapOperationValidator.IsValidPointOnMap(tile.x, tile.y, maxX, maxZ))
+                    if (MapOperationValidator.IsValidPointOnMap(tile.x, tile.y, maxX, maxZ))
                     {
-                        result.Add(tile, level * ringHeight);
+                        if (!result.ContainsKey(tile))
+                        {
+                            result.Add(tile, (-levelsCount + i) * ringHeight);
+                        }
+                        else
+                        {
+                            result[tile] = (-levelsCount + i) * ringHeight;
+                        }
                     }
                 }
-                ringBeginning += ringWidth;
-                level++;
             }
             return result;
         }

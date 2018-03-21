@@ -5,9 +5,8 @@ using UnityEngine;
 
 namespace Assets.Scripts.MapChanging
 {
-    public class MapPiecesSelector
+    public class MapPiecesSelector : MonoBehaviour
     {
-
         public static Vector2Int GetXRangeForRing(int x, int y, int ringIndex, int ringWidth)
         {
             var mostLeft = x - ringIndex - ringWidth + 1;
@@ -48,18 +47,63 @@ namespace Assets.Scripts.MapChanging
             return result;
         }
 
-        public static List<Vector2Int> GetRingAround(int x, int y, int ringIndex, int ringWidth, int maxX, int maxZ)
+        public static Dictionary<int, List<Vector2Int>> GetRingsAround(int x, int y, int ringsCount, int ringWidth,
+            int maxX, int maxZ, bool shortenLastRingByOne = true)
         {
-            if (ringIndex == 0)
+            var result = new Dictionary<int, List<Vector2Int>>();
+
+            for (int i = 0; i < ringsCount + 1; i++)
             {
-                throw new ArgumentException("Can't search for ring on index 0.");
+                result[i] = new List<Vector2Int>();
+                int currentRingOuterRadius = (i + 1) * ringWidth;
+                var currentRingInnerRadius = currentRingOuterRadius - ringWidth;
+
+                for (int currentY = 0; currentY < currentRingOuterRadius; ++currentY)
+                {
+                    var mostOuterX =
+                        (int) (Mathf.RoundToInt(Mathf.Sqrt(
+                            Mathf.Abs(currentRingOuterRadius * currentRingOuterRadius - currentY * currentY))));
+
+                    int mostInnerX;
+                    if (currentRingInnerRadius < currentY)
+                    {
+                        mostInnerX = 0;
+                    }
+                    else
+                    {
+                        mostInnerX =
+                            (int) (Mathf.RoundToInt(
+                                Mathf.Sqrt(Mathf.Abs(currentRingInnerRadius * currentRingInnerRadius -
+                                                     currentY * currentY))));
+                    }
+
+                    if (i == ringsCount - 1 && shortenLastRingByOne)
+                    {
+                        mostOuterX--;
+                    }
+
+                    for (int currentX = mostInnerX; currentX < mostOuterX; currentX++)
+                    {
+                        result[i].Add(new Vector2Int(currentX, currentY));
+                    }
+                }
             }
 
-            var outerCircle = GetCircleAround(x, y, ringIndex + ringWidth - 1, maxX, maxZ);
-            var innerCircle = GetCircleAround(x, y, ringIndex - 1, maxX, maxZ);
+            var finalResult = new Dictionary<int, List<Vector2Int>>();
+            for (int i = 0; i < ringsCount + 1; i++)
+            {
+                finalResult[i] = new List<Vector2Int>();
+                var toBeCopied = result[i].Select(a => a).ToList();
+                foreach (var vector2Int in toBeCopied)
+                {
+                    finalResult[i].Add(new Vector2Int(x + vector2Int.x, y + vector2Int.y));
+                    finalResult[i].Add(new Vector2Int(x - vector2Int.x, y + vector2Int.y));
+                    finalResult[i].Add(new Vector2Int(x + vector2Int.x, y - vector2Int.y));
+                    finalResult[i].Add(new Vector2Int(x - vector2Int.x, y - vector2Int.y));
+                }
+            }
 
-            var difference = outerCircle.Except(innerCircle).ToList();
-            return difference;
+            return finalResult;
         }
     }
 }
