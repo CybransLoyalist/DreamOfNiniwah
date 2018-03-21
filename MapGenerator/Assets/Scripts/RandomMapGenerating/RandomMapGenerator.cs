@@ -23,6 +23,7 @@ namespace Assets.Scripts.RandomMapGenerating
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+
 //            mapChanger.BuildMountain(0, 50, 5, 20, 0.5f);
 
 //             mapChanger.ColorRingsAround(20, 20, 5, 4);
