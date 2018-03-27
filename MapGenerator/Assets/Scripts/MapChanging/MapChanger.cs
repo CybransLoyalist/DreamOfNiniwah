@@ -10,7 +10,7 @@ namespace Assets.Scripts.MapChanging
     {
         public int ZResolution { get; private set; }
         public int XResolution {get; private set; }
-        public Dictionary<Vector2Int, Tile> Tiles;
+        public Dictionary<Vector2Int, Tile> Tiles { get; set; }
         private readonly MapChunksAccessor _mapChunksAccessor;
 
         public MapChanger(
@@ -40,6 +40,18 @@ namespace Assets.Scripts.MapChanging
             {
                 var tile = Tiles[new Vector2Int(x, y)];
                 ColorMiddleVertexOfTile(tile, color);
+            }
+        }
+
+        public void ChangeTileHeight(int x, int y, float height)
+        {
+            if (IsValidPointOnMap(x, y))
+            {
+                var tile = Tiles[new Vector2Int(x, y)];
+                foreach (var tileVertex in _mapChunksAccessor.AllTileVertices[tile])
+                {
+                    tileVertex.ChangeTileHeight(height);
+                }
             }
         }
 
@@ -86,10 +98,11 @@ namespace Assets.Scripts.MapChanging
 
         public void BuildMountain(int x, int y, int levelsCount, int ringWidth, float ringHeight)
         {
+            var baseHeight = _mapChunksAccessor.GetHeightOfTileAt(Tiles[new Vector2Int(x,y)]);
             var tileHeights = MountainBuilder.BuildMountain(x, y, levelsCount, ringWidth, ringHeight, XResolution, ZResolution);
             foreach (var tileHeight in tileHeights)
             {
-                RaiseTile(tileHeight.Key.x, tileHeight.Key.y, tileHeight.Value);
+                RaiseTile(tileHeight.Key.x, tileHeight.Key.y, tileHeight.Value + baseHeight);
             }
         }
 
@@ -170,6 +183,13 @@ namespace Assets.Scripts.MapChanging
                     ColorTileExact(tile.x, tile.y, _colors[ring.Key]);
                 }
             }
+        }
+
+        public HashSet<Vector2Int> GetCircle(int x, int y, int radius)
+        {
+            var circle = MapPiecesSelector.GetRingsAround(x, y, 0, radius, XResolution, ZResolution);
+
+            return new HashSet<Vector2Int>(circle[0]);
         }
 
         private bool IsValidPointOnMap(int x, int y)

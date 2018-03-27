@@ -11,7 +11,7 @@ namespace Assets.Scripts.MapChanging
 
             for (int i = 1; i < pointList.Count; i++)
             {
-                if (Vector2Int.Distance(pointList[i - 1], pointList[i]) < 15f)
+                if (Vector2Int.Distance(pointList[i - 1], pointList[i]) < 5f)
                 {
                     pointList.RemoveAt(i);
                     i--;
@@ -27,11 +27,11 @@ namespace Assets.Scripts.MapChanging
                 smoothedPoints.Add(pointList[i]);
 
                 smoothedPoints.Add(CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .5f));
-                //smoothedPoints.Add(Vector2.CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .2f));
-                //smoothedPoints.Add(Vector2.CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .3f));
-                //smoothedPoints.Add(Vector2.CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .7f));
-                //smoothedPoints.Add(Vector2.CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .8f));
-                //smoothedPoints.Add(Vector2.CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .9f));
+                smoothedPoints.Add(CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .2f));
+                smoothedPoints.Add(CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .3f));
+                smoothedPoints.Add(CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .7f));
+                smoothedPoints.Add(CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .8f));
+                smoothedPoints.Add(CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .9f));
             }
 
             smoothedPoints.Add(pointList[pointList.Count - 2]);

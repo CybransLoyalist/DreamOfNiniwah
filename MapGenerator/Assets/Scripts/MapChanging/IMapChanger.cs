@@ -13,10 +13,13 @@ namespace Assets.Scripts.MapChanging
         void BuildHollow(int x, int y, int levelsCount, int ringWidth, float ringHeight = 1f);
         List<Tile> GetNeighbours(Tile tile,  NeighbourMode neighbourMode = NeighbourMode.Orthogonal);
 
+        Dictionary<Vector2Int, Tile> Tiles { get; set; }
         int ZResolution { get; }
         int XResolution { get; }
         void RaiseTile(int x, int y, float height);
+        void ChangeTileHeight(int x, int y, float height);
 
         void ColorRingsAround(int x, int y, int ringsCount, int ringWidth);
+        HashSet<Vector2Int> GetCircle(int x, int y, int radius);
     }
 }

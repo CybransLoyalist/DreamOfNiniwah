@@ -31,12 +31,26 @@ namespace Assets.Scripts.MapMeshGenerating
 
         private void AssingHeight(float height)
         {
-            Chunk.Vertices[Index] = new Vector3(Chunk.Vertices[Index].x, height, Chunk.Vertices[Index].z);
+           // if (height > Chunk.Vertices[Index].y)
+            //{
+                Chunk.Vertices[Index] = new Vector3(Chunk.Vertices[Index].x, height, Chunk.Vertices[Index].z);
+
+//            }
+//            else
+//            {
+//                Chunk.Vertices[Index] = new Vector3(Chunk.Vertices[Index].x, Chunk.Vertices[Index].y + height, Chunk.Vertices[Index].z);
+//
+//            }
         }
 
         public void SetColor(Color color)
         {
             Chunk.VerticesColors[Index] = color;
+        }
+
+        public void ChangeTileHeight(float height)
+        {
+            AssingHeight(height);
         }
     }
 }

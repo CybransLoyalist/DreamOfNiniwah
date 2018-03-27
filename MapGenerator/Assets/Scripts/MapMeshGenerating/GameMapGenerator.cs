@@ -33,7 +33,7 @@ namespace Assets.Scripts.MapMeshGenerating
             var chunks = new MapChunk[chunksCountX, chunksCountZ];
             
             var MapChunksAccessor = new MapChunksAccessor();
-            var map = new MapChanger(
+            var mapChanger = new MapChanger(
                 xResolution,
                 zResolution,
                 MapChunksAccessor);
@@ -43,15 +43,15 @@ namespace Assets.Scripts.MapMeshGenerating
             {
                 for (int j = 0; j < chunksCountZ; j++)
                 {
-                   chunks[i,j] =  CreateTerrainChunk(i,j,map, MapChunksAccessor, new Vector2(i * chunkSizeX * meshScale, j * chunkSizeZ * meshScale), chunkSizeX,chunkSizeZ);
+                   chunks[i,j] =  CreateTerrainChunk(i,j,mapChanger, MapChunksAccessor, new Vector2(i * chunkSizeX * meshScale, j * chunkSizeZ * meshScale), chunkSizeX,chunkSizeZ);
                    
                 }
             }
            
-            MapChunksAccessor.Recalculate(map);
+            MapChunksAccessor.Recalculate(mapChanger);
 
-            var randomMapGenerator = new RandomMapGenerator();
-            randomMapGenerator.GenerateFor(map);
+            var randomMapGenerator = new RandomMapGenerator(mapChanger);
+            randomMapGenerator.GenerateFor();
             
             foreach (var mapChunk in chunks)
             {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.RandomMapGenerating
 {
-    public static class Smoother
+    public static class Smoother2
     {
         public static List<Vector2Int> Smooth(List<Vector2Int> pointList)
         {

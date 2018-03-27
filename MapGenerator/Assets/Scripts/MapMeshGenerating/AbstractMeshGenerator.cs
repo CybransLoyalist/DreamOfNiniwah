@@ -104,11 +104,12 @@ namespace Assets.Scripts.MapMeshGenerating
             mesh.SetVertices(_vertices);
             mesh.SetTriangles(_triangles, 0);
 
-            if (_normals.Count == 0)
-            {
+            //if (_normals.Count == 0)
+           // {
                 mesh.RecalculateNormals();
+            _normals.Clear();
                 _normals.AddRange(mesh.normals);
-            }
+           // }
 
 
             mesh.SetNormals(_normals);

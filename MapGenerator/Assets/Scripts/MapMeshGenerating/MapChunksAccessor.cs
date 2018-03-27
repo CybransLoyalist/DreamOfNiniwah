@@ -23,27 +23,13 @@ namespace Assets.Scripts.MapMeshGenerating
                 AllTileVertices[tileVertex.Key] = tileVertex.Value.ToList();
             }
 
-//            foreach (var tileVertex1 in AllTileVertices)
-//            {
-//                var tile = tileVertex1.Key;
-//                var neighbours = mapChanger.GetNeighbours(tile, NeighbourMode.All);
-//
-//                foreach (var neighbour in neighbours)
-//                {
-//                    foreach (var vertex in OwnTileVertices[neighbour])
-//                    {
-//                        if (tileVertex1.Value.Any(a => a.Location == vertex.Location))
-//                        {
-//                            if (!tileVertex1.Value.Contains(vertex))
-//                            {
-//                                tileVertex1.Value.Add(vertex);
-//                            }
-//                        }
-//                    }
-//                }
-//
-//            }
+        }
 
+        public float GetHeightOfTileAt(Tile tile)
+        {
+            var tileVertices = AllTileVertices[tile];
+
+            return tileVertices.Average(a => a.Location.y);
         }
     }
 }
