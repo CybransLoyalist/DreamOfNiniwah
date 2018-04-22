@@ -13,6 +13,8 @@ namespace Assets.Scripts.RandomMapGenerating
         private readonly Random _random;
         private readonly IMapChanger _mapChanger;
         private readonly List<Vector2Int> _mainNodes;
+        private List<Vector2Int> _riverNodes;
+        private Dictionary<Vector2Int, Side> _riverMouths;
 
         public RiverGenerator(Random random, IMapChanger mapChanger)
         {
@@ -29,41 +31,39 @@ namespace Assets.Scripts.RandomMapGenerating
             Vector2Int preSourceNode = GetExternalNodeOf(sourceEdge, source);
 
             var riverNodesCount = _random.Next(4, 6);
-            var nodes = new List<Vector2Int> { preSourceNode, source };
+            _riverNodes = new List<Vector2Int> { preSourceNode, source };
 
-
-            var riverMouths = new Dictionary<Vector2Int, Side>();
+            _riverMouths = new Dictionary<Vector2Int, Side>();
             for (int i = 1; i < riverNodesCount + 2; i++)
             {
-                AddNode(sourceEdge, i, riverNodesCount, nodes, riverMouths);
-
+                AddNode(sourceEdge, i, riverNodesCount);
             }
 
             switch (sourceEdge)
             {
                 case Side.Top:
-                    nodes = nodes.OrderByDescending(a => a.y).ToList();
+                    _riverNodes = _riverNodes.OrderByDescending(a => a.y).ToList();
                     break;
                 case Side.Right:
-                    nodes = nodes.OrderByDescending(a => a.x).ToList();
+                    _riverNodes = _riverNodes.OrderByDescending(a => a.x).ToList();
                     break;
                 case Side.Bottom:
-                    nodes = nodes.OrderBy(a => a.y).ToList();
+                    _riverNodes = _riverNodes.OrderBy(a => a.y).ToList();
                     break;
                 case Side.Left:
-                    nodes = nodes.OrderBy(a => a.x).ToList();
+                    _riverNodes = _riverNodes.OrderBy(a => a.x).ToList();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            var riverMouthsCount = 4;// _random.Next(1, 4);
+            var riverMouthsCount =  _random.Next(1, 4);
             var riverMouthChunks = new List<Vector2Int>();
 
 
-            var mainRiverMouth = riverMouths.First().Key;
-            nodes.Add(mainRiverMouth);
-            nodes.Add(GetExternalNodeOf(riverMouths[mainRiverMouth], mainRiverMouth));
+            var mainRiverMouth = _riverMouths.First().Key;
+            _riverNodes.Add(mainRiverMouth);
+            _riverNodes.Add(GetExternalNodeOf(_riverMouths[mainRiverMouth], mainRiverMouth));
 
             for (int i = 0; i < riverMouthsCount; i++)
             {
@@ -84,7 +84,7 @@ namespace Assets.Scripts.RandomMapGenerating
                             edge = EnumRangdomValueGetter.Get<Side>();
                         }
                         mouth = GetRandomPointOnEdge(edge);
-                        var closestMouth = GetClosestNode(mouth, riverMouths.Select(a => a.Key).ToList());
+                        var closestMouth = GetClosestNode(mouth, _riverMouths.Select(a => a.Key).ToList());
                         distanceToClosestMouth = Vector2Int.Distance(closestMouth, mouth);
                         ++counter;
                         if (counter == 25)
@@ -93,29 +93,29 @@ namespace Assets.Scripts.RandomMapGenerating
                         }
                     }
 
-                    riverMouths[new Vector2Int(mouth.x, mouth.y)] = edge;
+                    _riverMouths[new Vector2Int(mouth.x, mouth.y)] = edge;
                 }
             }
 
         
-            var rivewrMouthsToBeProcessed = riverMouths.Select(a => a.Key).Where(n => n != mainRiverMouth).ToList();
+            var rivewrMouthsToBeProcessed = _riverMouths.Select(a => a.Key).Where(n => n != mainRiverMouth).ToList();
             foreach (var riverMouth in rivewrMouthsToBeProcessed)
             {
 
-                CreateMouthRiverChunk( nodes, riverMouth, riverMouthChunks, riverMouths);
+                CreateMouthRiverChunk( _riverNodes, riverMouth, riverMouthChunks);
             }
 
             
-            river.AddRange(nodes);
+            river.AddRange(_riverNodes);
             river = Smoother.Smooth(river);
             river.AddRange(riverMouthChunks);
 
-            foreach (var vector2Int in nodes)
+            foreach (var vector2Int in _riverNodes)
             {
                 _mapChanger.ColorTile(vector2Int.x, vector2Int.y, Color.red);
             }
 
-            foreach (var vector2Int in riverMouths.Select(a => a.Key))
+            foreach (var vector2Int in _riverMouths.Select(a => a.Key))
             {
                 _mapChanger.ColorTile(vector2Int.x, vector2Int.y, Color.green);
             }
@@ -126,7 +126,7 @@ namespace Assets.Scripts.RandomMapGenerating
             }
         }
 
-        private void AddNode(Side sourceEdge, int i, int riverNodesCount, List<Vector2Int> nodes, Dictionary<Vector2Int, Side> riverMouths)
+        private void AddNode(Side sourceEdge, int i, int _riverNodesCount)
         {
             const int borderOffset = 15;
             const int stripDivider = 2;
@@ -135,9 +135,9 @@ namespace Assets.Scripts.RandomMapGenerating
             {
 
                 int maxSideOffset = _mapChanger.XResolution / 2;
-                var stripWidth = _mapChanger.ZResolution / ((riverNodesCount + 1) * stripDivider);
+                var stripWidth = _mapChanger.ZResolution / ((_riverNodesCount + 1) * stripDivider);
 
-                var previousNode = nodes[i - 1];
+                var previousNode = _riverNodes[i - 1];
                 var minX = previousNode.x - maxSideOffset < borderOffset
                     ? borderOffset
                     : previousNode.x - maxSideOffset;
@@ -161,29 +161,29 @@ namespace Assets.Scripts.RandomMapGenerating
                 var y = _random.Next(minY, maxY);
 
 
-                if (i == riverNodesCount + 1)
+                if (i == _riverNodesCount + 1)
                 {
                     if (sourceEdge == Side.Top)
                     {
-                        riverMouths[new Vector2Int(x, 0)] = sourceEdge.GetOpposite();
+                        _riverMouths[new Vector2Int(x, 0)] = sourceEdge.GetOpposite();
                     }
                     else
                     {
-                        riverMouths[new Vector2Int(x, _mapChanger.ZResolution - 1)] = sourceEdge.GetOpposite();
+                        _riverMouths[new Vector2Int(x, _mapChanger.ZResolution - 1)] = sourceEdge.GetOpposite();
                     }
                 }
                 else
                 {
                     _mainNodes.Add(new Vector2Int(x, y));
-                    nodes.Add(new Vector2Int(x, y));
+                    _riverNodes.Add(new Vector2Int(x, y));
                 }
             }
             if (sourceEdge == Side.Left || sourceEdge == Side.Right)
             {
                 int maxSideOffset = _mapChanger.ZResolution / 2;
-                var stripWidth = _mapChanger.XResolution / ((riverNodesCount + 1) * stripDivider);
+                var stripWidth = _mapChanger.XResolution / ((_riverNodesCount + 1) * stripDivider);
 
-                var previousNode = nodes[i - 1];
+                var previousNode = _riverNodes[i - 1];
                 var minY = previousNode.y - maxSideOffset < borderOffset
                     ? borderOffset
                     : previousNode.y - maxSideOffset;
@@ -208,31 +208,31 @@ namespace Assets.Scripts.RandomMapGenerating
                 var x = _random.Next(minX, maxX);
 
 
-                if (i == riverNodesCount + 1)
+                if (i == _riverNodesCount + 1)
                 {
                     if (sourceEdge == Side.Left)
                     {
-                        riverMouths[new Vector2Int(_mapChanger.XResolution - 1, y)] = sourceEdge.GetOpposite();
+                        _riverMouths[new Vector2Int(_mapChanger.XResolution - 1, y)] = sourceEdge.GetOpposite();
                     }
                     else
                     {
-                        riverMouths[new Vector2Int(0, y)] = sourceEdge.GetOpposite();
+                        _riverMouths[new Vector2Int(0, y)] = sourceEdge.GetOpposite();
                     }
                 }
                 else
                 {
                     _mainNodes.Add(new Vector2Int(x, y));
-                    nodes.Add(new Vector2Int(x, y));
+                    _riverNodes.Add(new Vector2Int(x, y));
                 }
             }
         }
 
 
 
-        private void CreateMouthRiverChunk(List<Vector2Int> nodes, Vector2Int riverMouth, List<Vector2Int> riverMouthChunks, Dictionary<Vector2Int, Side> riverMouths)
+        private void CreateMouthRiverChunk(List<Vector2Int> nodes, Vector2Int riverMouth, List<Vector2Int> riverMouthChunks)
         {
             var closestNode = GetClosestNode(riverMouth, _mainNodes);
-            CreateMouthRiverChunkForNode(nodes, riverMouth, riverMouthChunks, riverMouths[riverMouth], closestNode);
+            CreateMouthRiverChunkForNode(nodes, riverMouth, riverMouthChunks, _riverMouths[riverMouth], closestNode);
         }
 
         private static void CreateMouthRiverChunkForNode(List<Vector2Int> nodes, Vector2Int riverMouth, List<Vector2Int> riverMouthChunks, Side edge, Vector2Int closestNode)
